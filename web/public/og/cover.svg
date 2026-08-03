@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f3d2e"/>
+      <stop offset="50%" stop-color="#3f5d3f"/>
+      <stop offset="100%" stop-color="#14271e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4d7c58"/>
+      <stop offset="50%" stop-color="#7d8f4d"/>
+      <stop offset="100%" stop-color="#d9a441"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="960" cy="180" r="220" fill="#ffffff" opacity="0.06"/>
+  <circle cx="300" cy="520" r="260" fill="#ffffff" opacity="0.04"/>
+  <text x="80" y="280" font-family="Georgia, serif" font-size="76" fill="#f5f2ea" font-weight="600">Pasture &amp; Co.</text>
+  <text x="80" y="340" font-family="Inter, Arial, sans-serif" font-size="30" fill="#ffffff" opacity="0.75" letter-spacing="1">The modern livestock &amp; poultry marketplace</text>
+  <rect x="80" y="400" width="420" height="8" rx="4" fill="url(#accent)"/>
+  <text x="80" y="470" font-family="Inter, Arial, sans-serif" font-size="22" fill="#ffffff" opacity="0.6">Healthy livestock · verified farms · delivered to your gate</text>
+</svg>

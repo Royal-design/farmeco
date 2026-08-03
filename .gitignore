@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+*.log
+npm-debug.log*
+
+# next.js
+.next/
+out/
+build/
+
+# misc
+.DS_Store
+*.pem
+
+# env
+.env
+.env.local
+.env.*.local
+
+# typescript
+*.tsbuildinfo
+
+# ide
+.idea/
+.vscode/

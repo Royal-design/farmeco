@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CameraIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/schemas/profile.schema"
 import { usersService } from "@/services/users.service"
 import { useAuthStore } from "@/store/auth-store"
+import { getErrorMessage } from "@/lib/errors"
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -31,6 +33,8 @@ function ProfileForm() {
   const user = useAuthStore((state) => state.user)
   const setUser = useAuthStore((state) => state.setUser)
   const [isPending, startTransition] = React.useTransition()
+  const avatarInputRef = React.useRef<HTMLInputElement>(null)
+  const [uploadingAvatar, setUploadingAvatar] = React.useState(false)
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -96,6 +100,28 @@ function ProfileForm() {
     })
   })
 
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+    setUploadingAvatar(true)
+    try {
+      const updated = await usersService.updateAvatar(file)
+      setUser(updated)
+      toast.success("Profile photo updated")
+    } catch (error) {
+      toast.error("Couldn't update your photo", {
+        description: getErrorMessage(error),
+      })
+    } finally {
+      setUploadingAvatar(false)
+      if (avatarInputRef.current) {
+        avatarInputRef.current.value = ""
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
@@ -105,17 +131,45 @@ function ProfileForm() {
         </p>
       </div>
 
-      <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5">
-        <Avatar src={user?.avatar} name={user?.name ?? "User"} size="xl" />
-        <div>
+      <div className="flex flex-wrap items-center gap-5 rounded-2xl border border-border bg-card p-5">
+        <div className="relative">
+          <Avatar src={user?.avatar} name={user?.name ?? "User"} size="xl" />
+          <button
+            type="button"
+            onClick={() => avatarInputRef.current?.click()}
+            aria-label="Change profile photo"
+            disabled={uploadingAvatar}
+            className="absolute -right-1 -bottom-1 flex size-8 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-sm transition-colors hover:bg-brand/90 disabled:opacity-50"
+          >
+            <CameraIcon className="size-4" />
+          </button>
+        </div>
+        <div className="min-w-0">
           <p className="font-heading text-lg font-medium">{user?.name}</p>
           <p className="text-sm text-muted-foreground">
             Member since {user?.joinedAt ? new Date(user.joinedAt).getFullYear() : "—"}
           </p>
-          <span className="mt-1 inline-flex rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium capitalize text-brand">
-            {user?.role ?? "buyer"} account
-          </span>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="inline-flex rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium capitalize text-brand">
+              {user?.role ?? "buyer"} account
+            </span>
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="text-xs font-medium text-brand hover:underline disabled:opacity-50"
+            >
+              {uploadingAvatar ? "Uploading…" : "Change photo"}
+            </button>
+          </div>
         </div>
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleAvatarChange}
+        />
       </div>
 
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6">

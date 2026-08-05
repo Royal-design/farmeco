@@ -38,8 +38,8 @@ function AdminCategoriesPage() {
   const [deleting, setDeleting] = React.useState(false)
 
   const { data: categories, isLoading } = useQuery({
-    queryKey: ["categories", "all"],
-    queryFn: categoriesService.getCategories,
+    queryKey: ["categories", "all", "newest"],
+    queryFn: () => categoriesService.getCategoriesSorted("newest"),
   })
 
   const openCreate = () => {

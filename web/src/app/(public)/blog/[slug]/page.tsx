@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import { notFound } from "next/navigation"
 
 import { blogService } from "@/services/blog.service"
@@ -104,11 +105,16 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <div className="mx-auto max-w-3xl px-5 py-10 sm:px-8">
-          <img
-            src={post.coverImage}
-            alt={post.title}
-            className="mb-10 aspect-[16/8] w-full rounded-3xl border border-border object-cover shadow-lift"
-          />
+          {post.coverImage ? (
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              width={1600}
+              height={800}
+              priority
+              className="mb-10 aspect-[16/8] w-full rounded-3xl border border-border object-cover shadow-lift"
+            />
+          ) : null}
           <div className="flex flex-col gap-6">
             {post.content.map((paragraph, index) => (
               <p

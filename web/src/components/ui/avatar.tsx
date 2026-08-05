@@ -1,3 +1,5 @@
+import Image from "next/image"
+
 import { cn } from "@/lib/utils"
 import { initials } from "@/utils/string"
 
@@ -34,9 +36,11 @@ function Avatar({
       {...props}
     >
       {src ? (
-        <img
+        <Image
           src={src}
           alt={name}
+          width={96}
+          height={96}
           className="size-full object-cover"
           loading="lazy"
         />

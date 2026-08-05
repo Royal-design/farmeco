@@ -63,6 +63,7 @@ function ProductsView({
         pageSize: 12,
         search: debouncedSearch || undefined,
         sellerId,
+        sort: "newest",
       }),
   })
 

@@ -32,6 +32,13 @@ export const categoriesService = {
     return data.map(mapCategory)
   },
 
+  async getCategoriesSorted(
+    sort: "newest" | "oldest" | "name"
+  ): Promise<Category[]> {
+    const { data } = await api.get<RawCategory[]>("/categories", { sort })
+    return data.map(mapCategory)
+  },
+
   async getFeaturedCategories(): Promise<Category[]> {
     const { data } = await api.get<RawCategory[]>("/categories/featured")
     return data.map(mapCategory)

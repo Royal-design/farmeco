@@ -8,6 +8,7 @@ import {
   ShieldCheckIcon,
 } from "lucide-react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 
 import { gallery } from "@/mock/gallery"
 import { AnimatedButton } from "@/components/shared/animated-button"
@@ -137,10 +138,13 @@ function Hero() {
           className="relative mx-auto w-full max-w-lg lg:max-w-none"
         >
           <div className="relative aspect-[4/4.4] overflow-hidden rounded-[2rem] border border-white/20 shadow-lift">
-            <img
+            <Image
               src={gallery.hero}
               alt="Pasture and livestock"
-              className="size-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 90vw"
+              className="object-cover"
+              priority
             />
             <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/40 to-transparent" />
             <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
@@ -153,7 +157,7 @@ function Hero() {
               <AnimatedButton
                 href="/shop"
                 size="sm"
-                className="rounded-full bg-white/90 text-foreground backdrop-blur hover:bg-white"
+                className="rounded-full bg-white/90 text-night backdrop-blur hover:bg-white"
               >
                 Shop now
               </AnimatedButton>
@@ -166,7 +170,7 @@ function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: badge.delay }}
-              className="absolute hidden sm:block"
+              className={`absolute hidden sm:block ${badge.className}`}
             >
               <motion.div
                 animate={{ y: [0, -10, 0] }}
@@ -176,7 +180,6 @@ function Hero() {
                   ease: "easeInOut",
                   delay: badge.delay,
                 }}
-                className={badge.className}
               >
                 <div className="glass flex items-center gap-3 rounded-2xl border border-white/20 p-3 shadow-lift">
                   <span className="flex size-9 items-center justify-center rounded-xl bg-brand text-white">

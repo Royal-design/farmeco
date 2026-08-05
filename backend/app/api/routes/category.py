@@ -18,11 +18,13 @@ router = APIRouter()
 def get_categories(
     featured: bool | None = Query(None),
     search: str | None = Query(None),
+    sort: str = Query("featured"),
     category_service: CategoryService = Depends(get_category_service),
 ):
     categories = category_service.get_all_categories(
         featured=featured,
         search=search,
+        sort=sort,
     )
 
     return SuccessResponse(

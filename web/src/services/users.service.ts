@@ -46,7 +46,7 @@ export const usersService = {
   async updateAvatar(file: File): Promise<User> {
     const formData = new FormData()
     formData.append("avatar", file)
-    const { data } = await api.upload<RawUser>("/users/me/avatar", formData)
+    const { data } = await api.put<RawUser>("/users/me/avatar", formData)
     return mapUser(data)
   },
 

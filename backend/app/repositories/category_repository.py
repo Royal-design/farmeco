@@ -15,6 +15,7 @@ class CategoryRepository:
         self,
         featured: bool | None = None,
         search: str | None = None,
+        sort: str = "featured",
     ) -> list[Category]:
         query = self.db.query(Category)
 
@@ -31,11 +32,19 @@ class CategoryRepository:
                 )
             )
 
-        return (
-            query
-            .order_by(Category.featured.desc(), Category.name.asc())
-            .all()
-        )
+        ordering = {
+            "newest": Category.created_at.desc(),
+            "oldest": Category.created_at.asc(),
+            "name": Category.name.asc(),
+        }
+        order_by = ordering.get(sort, [Category.featured.desc(), Category.name.asc()])
+
+        if isinstance(order_by, list):
+            query = query.order_by(*order_by)
+        else:
+            query = query.order_by(order_by)
+
+        return query.all()
 
     def get_category_by_id(self, category_id: UUID) -> Category | None:
         return self.db.query(Category).filter(Category.id == category_id).first()

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRightIcon } from "lucide-react"
+import { ChevronRightIcon, ShieldIcon, StoreIcon } from "lucide-react"
 
 import { mainNav } from "@/config/site"
 import { useUIStore } from "@/store/ui-store"
@@ -41,7 +41,7 @@ function MobileNav() {
         <DrawerBody>
           {status === "authenticated" && user && (
             <Link
-              href="/account"
+              href={user.role === "admin" ? "/admin" : user.role === "seller" ? "/seller" : "/account"}
               onClick={close}
               className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-3"
             >
@@ -56,6 +56,34 @@ function MobileNav() {
               </span>
               <ChevronRightIcon className="ml-auto size-4 text-muted-foreground" />
             </Link>
+          )}
+
+          {status === "authenticated" && user && user.role !== "buyer" && (
+            <div className="mb-2 flex flex-col gap-1">
+              <span className="px-3 py-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                Dashboard
+              </span>
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  onClick={close}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <ShieldIcon className="size-4.5 text-brand" />
+                  Admin dashboard
+                </Link>
+              )}
+              {user.role === "seller" && (
+                <Link
+                  href="/seller"
+                  onClick={close}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  <StoreIcon className="size-4.5 text-brand" />
+                  Seller dashboard
+                </Link>
+              )}
+            </div>
           )}
 
           <nav aria-label="Mobile" className="flex flex-col gap-1">
@@ -94,7 +122,17 @@ function MobileNav() {
                 </ButtonLink>
               </>
             ) : (
-              <ButtonLink href="/account" variant="outline" onClick={close}>
+              <ButtonLink
+                href={
+                  user?.role === "admin"
+                    ? "/admin"
+                    : user?.role === "seller"
+                      ? "/seller"
+                      : "/account"
+                }
+                variant="outline"
+                onClick={close}
+              >
                 Go to dashboard
               </ButtonLink>
             )}

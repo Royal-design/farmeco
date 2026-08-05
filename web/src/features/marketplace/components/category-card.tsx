@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowUpRightIcon } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -30,12 +31,16 @@ function CategoryCard({ category, className, compact = false }: CategoryCardProp
           compact ? "aspect-[4/3]" : "aspect-[4/5] sm:aspect-[3/4]"
         )}
       >
-        <img
-          src={category.image}
-          alt={category.name}
-          loading="lazy"
-          className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-        />
+        {category.image ? (
+          <Image
+            src={category.image}
+            alt={category.name}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 50vw"
+            loading="lazy"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+          />
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
 
         <motion.div

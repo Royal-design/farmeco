@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRightIcon, ClockIcon } from "lucide-react"
 
 import type { BlogPost } from "@/types/blog"
@@ -27,12 +28,16 @@ function BlogCard({ post, className }: BlogCardProps) {
         className="relative block aspect-[16/9] overflow-hidden bg-muted"
         aria-label={post.title}
       >
-        <img
-          src={post.coverImage}
-          alt={post.title}
-          loading="lazy"
-          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-        />
+        {post.coverImage ? (
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            loading="lazy"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+          />
+        ) : null}
         <span className="absolute top-3 left-3">
           <Badge variant="brand" className="bg-background/85 text-foreground ring-0 backdrop-blur dark:bg-background/85 dark:text-foreground">
             {post.category}

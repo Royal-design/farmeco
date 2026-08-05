@@ -50,8 +50,13 @@ class CategoryService:
         self,
         featured: bool | None = None,
         search: str | None = None,
+        sort: str = "featured",
     ) -> list[Category]:
-        return self.repository.get_all_categories(featured=featured, search=search)
+        return self.repository.get_all_categories(
+            featured=featured,
+            search=search,
+            sort=sort,
+        )
 
     # -------------------------
     # GET FEATURED CATEGORIES

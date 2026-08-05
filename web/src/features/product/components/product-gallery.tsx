@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -21,16 +22,22 @@ function ProductGallery({ images, name }: ProductGalleryProps) {
     <div className="flex flex-col gap-4">
       <div className="relative aspect-square overflow-hidden rounded-3xl border border-border bg-muted">
         <AnimatePresence mode="wait">
-          <motion.img
+          <motion.div
             key={active}
-            src={images[active]}
-            alt={`${name} — view ${active + 1}`}
             initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="size-full object-cover"
-          />
+            className="absolute inset-0"
+          >
+            <Image
+              src={images[active]}
+              alt={`${name} — view ${active + 1}`}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </motion.div>
         </AnimatePresence>
 
         {images.length > 1 && (
@@ -70,7 +77,13 @@ function ProductGallery({ images, name }: ProductGalleryProps) {
                 : "border-border opacity-70 hover:opacity-100"
             )}
           >
-            <img src={image} alt="" className="size-full object-cover" />
+            <Image
+              src={image}
+              alt=""
+              fill
+              sizes="80px"
+              className="object-cover"
+            />
           </button>
         ))}
       </div>

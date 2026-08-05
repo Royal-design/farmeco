@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import {
   ArrowRightIcon,
   ShoppingBagIcon,
@@ -103,11 +104,15 @@ function CartPage() {
                 href={`/shop/${item.slug}`}
                 className="size-24 shrink-0 overflow-hidden rounded-xl bg-muted sm:size-28"
               >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="size-full object-cover"
-                />
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    width={112}
+                    height={112}
+                    className="size-full object-cover"
+                  />
+                ) : null}
               </Link>
               <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <div className="flex items-start justify-between gap-3">

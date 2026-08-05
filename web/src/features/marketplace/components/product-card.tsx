@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { HeartIcon, ShoppingBagIcon, MapPinIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -78,12 +79,16 @@ function ProductCard({
         className="relative block aspect-[5/4] overflow-hidden bg-muted"
         aria-label={product.name}
       >
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          loading={priority ? "eager" : "lazy"}
-          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-        />
+        {product.images[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            loading={priority ? "eager" : "lazy"}
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+          />
+        ) : null}
 
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
           {product.badges.slice(0, 2).map((badge) => {

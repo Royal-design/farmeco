@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ShieldCheckIcon, TruckIcon, BadgeCheckIcon } from "lucide-react"
 
 import { Logo } from "@/components/shared/logo"
@@ -22,10 +23,12 @@ function AuthShell({ children }: AuthShellProps) {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <img
+        <Image
           src={gallery.hero}
           alt=""
-          className="absolute inset-0 size-full object-cover"
+          fill
+          sizes="50vw"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-brand/90 via-brand/70 to-night/90" />
         <GradientOrb variant="honey" className="top-20 right-10 opacity-40" />

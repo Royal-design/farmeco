@@ -42,15 +42,14 @@ function Logo({ className, href = "/", showWordmark = true }: LogoProps) {
   return (
     <Link
       href={href}
-      aria-label="Pasture & Co. home"
+      aria-label="Farmeco home"
       className={cn("group inline-flex items-center gap-2.5", className)}
     >
       <LogoMark />
       {showWordmark && (
         <span className="flex flex-col leading-none">
           <span className="font-heading text-lg font-semibold tracking-tight text-foreground">
-            Pasture
-            <span className="text-honey-foreground">&amp; Co.</span>
+            Farm<span className="text-brand">eco</span>
           </span>
           <span className="text-[0.6rem] font-medium tracking-[0.22em] text-muted-foreground uppercase">
             Livestock marketplace

@@ -33,6 +33,6 @@ export const useWishlistStore = create<WishlistState>()(
         })),
       clear: () => set({ ids: [] }),
     }),
-    { name: "pasture.wishlist" }
+    { name: "farmeco.wishlist" }
   )
 )

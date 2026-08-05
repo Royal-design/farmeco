@@ -40,7 +40,7 @@ function DashboardOverview() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard icon={ShoppingBagIcon} label="Total orders" value={items.length} accent="brand" hint="All time" />
-        <StatsCard icon={WalletIcon} label="Total spent" value={totalSpent} prefix="$" decimals={0} accent="honey" hint="Across all orders" />
+        <StatsCard icon={WalletIcon} label="Total spent" value={totalSpent} prefix="₦" decimals={0} accent="honey" hint="Across all orders" />
         <StatsCard icon={TruckIcon} label="In transit" value={activeOrders} accent="moss" hint="Processing & shipped" />
         <StatsCard icon={ClockIcon} label="Delivered" value={delivered} accent="clay" hint="Completed orders" />
       </div>

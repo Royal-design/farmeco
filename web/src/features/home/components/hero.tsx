@@ -32,7 +32,7 @@ const floatingBadges = [
   {
     icon: TruckIcon,
     title: "Free delivery",
-    subtitle: "Orders over $200",
+    subtitle: "Orders over ₦200,000",
     className: "-right-3 top-1/3 sm:-right-8",
     delay: 0.35,
   },

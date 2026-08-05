@@ -41,7 +41,7 @@ function AnnouncementBar() {
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-brand via-moss to-brand px-4 py-2 text-center">
       <p className="text-xs font-medium tracking-wide text-brand-foreground">
-        Free doorstep delivery on orders over $200 ·{" "}
+        Free doorstep delivery on orders over ₦200,000 ·{" "}
         <span className="underline underline-offset-2">Health-checked livestock</span>{" "}
         from verified farms
       </p>

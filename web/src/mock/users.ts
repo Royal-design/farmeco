@@ -20,7 +20,7 @@ export const currentUser: User = {
   preferences: {
     notifications: true,
     marketing: false,
-    currency: "USD",
+    currency: "NGN",
   },
 }
 
@@ -35,7 +35,7 @@ export const mockUsers: User[] = [
     avatar: avatar("#4d7c58", "#a8895b", "MB"),
     joinedAt: "2024-03-02",
     emailVerified: true,
-    preferences: { notifications: true, marketing: true, currency: "USD" },
+    preferences: { notifications: true, marketing: true, currency: "NGN" },
   },
   {
     id: "u3",
@@ -46,7 +46,7 @@ export const mockUsers: User[] = [
     avatar: avatar("#3f7a82", "#8a5f99", "EV"),
     joinedAt: "2023-11-19",
     emailVerified: true,
-    preferences: { notifications: false, marketing: false, currency: "USD" },
+    preferences: { notifications: false, marketing: false, currency: "NGN" },
   },
   {
     id: "u4",
@@ -57,6 +57,6 @@ export const mockUsers: User[] = [
     avatar: avatar("#c99a5b", "#4d7c58", "JK"),
     joinedAt: "2024-06-27",
     emailVerified: true,
-    preferences: { notifications: true, marketing: true, currency: "USD" },
+    preferences: { notifications: true, marketing: true, currency: "NGN" },
   },
 ]

@@ -22,7 +22,7 @@ export interface ResetPasswordPayload {
   password: string
 }
 
-const SESSION_KEY = "pasture.session"
+const SESSION_KEY = "farmeco.session"
 
 function buildSession(user: User): AuthSession {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()

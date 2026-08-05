@@ -1,18 +1,18 @@
 export const siteConfig = {
-  name: "Pasture & Co.",
-  shortName: "Pasture",
+  name: "Farmeco",
+  shortName: "Farmeco",
   tagline: "The modern marketplace for livestock & poultry",
   description:
     "Buy and sell premium cattle, goats, sheep, pigs, poultry and farm essentials with trusted local farms. Verified sellers, health-certified animals, and doorstep delivery.",
-  url: "https://pastureandco.example.com",
+  url: "https://farmeco.example.com",
   ogImage: "/og/cover.svg",
   links: {
     twitter: "https://twitter.com",
     github: "https://github.com",
   },
-  supportEmail: "care@pastureandco.example.com",
-  phone: "+1 (555) 014-7268",
-  location: "Greenfield Valley, New Farm County",
+  supportEmail: "care@farmeco.example.com",
+  phone: "+234 800 123 4567",
+  location: "Karu, Federal Capital Territory",
 } as const
 
 export type SiteConfig = typeof siteConfig

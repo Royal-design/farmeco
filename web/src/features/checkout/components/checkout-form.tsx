@@ -23,7 +23,7 @@ import { ordersService } from "@/services/orders.service"
 import { couponsService } from "@/services/coupons.service"
 import type { Coupon } from "@/types/order"
 import { formatPrice } from "@/utils/format"
-import { FREE_SHIPPING_THRESHOLD } from "@/constants/order"
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "@/constants/order"
 import { cn } from "@/lib/utils"
 import { Button, ButtonLink } from "@/components/ui/button"
 import {
@@ -94,7 +94,7 @@ function CheckoutForm() {
       ? subtotal * (appliedCoupon.value / 100)
       : appliedCoupon.value
     : 0
-  const delivery = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 24
+  const delivery = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE
   const total = Math.max(0, subtotal - discount) + delivery
 
   const handleApplyCoupon = async () => {

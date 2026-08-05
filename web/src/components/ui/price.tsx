@@ -20,7 +20,7 @@ const sizes = {
 function Price({
   value,
   compareAt,
-  currency = "USD",
+  currency = "NGN",
   unit,
   className,
   size = "md",

@@ -9,7 +9,7 @@ import { gallery } from "@/mock/gallery"
 export const metadata: Metadata = {
   title: "About us",
   description:
-    "Pasture & Co. is the modern livestock marketplace connecting verified farms with farmers who care — with health-certified animals and delivery you can trust.",
+    "Farmeco is the modern livestock marketplace connecting verified farms with farmers who care — with health-certified animals and delivery you can trust.",
   alternates: { canonical: "/about" },
 }
 
@@ -53,7 +53,7 @@ export default function AboutPage() {
       <PageHeader
         eyebrow="About us"
         title="The modern way to move livestock"
-        description="Pasture & Co. exists to make buying and selling animals as reassuring as trading with a trusted neighbour — but at the scale of the internet."
+        description="Farmeco exists to make buying and selling animals as reassuring as trading with a trusted neighbour — but at the scale of the internet."
         crumbs={[{ label: "About" }]}
       />
 
@@ -79,7 +79,7 @@ export default function AboutPage() {
                   photo.
                 </p>
                 <p>
-                  We built Pasture & Co. to fix that. Every farm is
+                  We built Farmeco to fix that. Every farm is
                   location-verified, every listing carries its health paperwork,
                   and every delivery is coordinated by licensed, biosecure
                   hauliers.

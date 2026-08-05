@@ -14,7 +14,7 @@ import { Marquee } from "@/components/shared/marquee"
 const items = [
   { icon: ShieldCheckIcon, label: "Every animal vet-checked" },
   { icon: BadgeCheckIcon, label: "Verified farm locations" },
-  { icon: TruckIcon, label: "Free delivery over $200" },
+  { icon: TruckIcon, label: "Free delivery over ₦200,000" },
   { icon: RefreshCcwIcon, label: "7-day health guarantee" },
   { icon: LeafIcon, label: "Carbon-conscious transport" },
   { icon: CreditCardIcon, label: "Secure payments" },

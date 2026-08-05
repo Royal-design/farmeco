@@ -31,6 +31,6 @@ export const badgeMeta: Record<ProductBadge, { label: string; tone: string }> = 
   certified: { label: "Certified", tone: "brand" },
 }
 
-export const FREE_SHIPPING_THRESHOLD = 200
-export const SHIPPING_FLAT_RATE = 24
-export const SHIPPING_PERISHABLE_RATE = 9
+export const FREE_SHIPPING_THRESHOLD = 200000
+export const SHIPPING_FLAT_RATE = 15000
+export const SHIPPING_PERISHABLE_RATE = 5000

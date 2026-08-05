@@ -1,6 +1,6 @@
 const currencyFormatterCache = new Map<string, Intl.NumberFormat>()
 
-function getCurrencyFormatter(currency: string, locale = "en-US") {
+function getCurrencyFormatter(currency: string, locale = "en-NG") {
   let formatter = currencyFormatterCache.get(`${currency}-${locale}`)
   if (!formatter) {
     formatter = new Intl.NumberFormat(locale, {
@@ -15,8 +15,8 @@ function getCurrencyFormatter(currency: string, locale = "en-US") {
 
 export function formatPrice(
   value: number,
-  currency = "USD",
-  locale = "en-US"
+  currency = "NGN",
+  locale = "en-NG"
 ) {
   return getCurrencyFormatter(currency, locale).format(value)
 }

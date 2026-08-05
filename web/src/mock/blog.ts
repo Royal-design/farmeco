@@ -84,7 +84,7 @@ export const blogPosts: BlogPost[] = [
       "A2/A2 milk is no longer a niche trend. Consumers who experience discomfort with conventional milk are increasingly seeking out A2/A2 herds, and the premium in many markets now sits at 15–30% over commodity pricing.",
       "The science is straightforward. Cows carry either the A1 or A2 beta-casein gene. A2/A2 animals produce milk without the A1 protein variant associated with digestive discomfort in sensitive people.",
       "Getting there starts with a simple tail-hair DNA test, typically costing less than the sale price of one milk cheque. Breeders who genotype their herds build a genetic bank that compounds in value every generation.",
-      "Marketing matters as much as genetics. Transparency sells — share test certificates, herd photos and the farm's story. Buyers on marketplaces like Pasture & Co. filter specifically for A2/A2 certified listings.",
+      "Marketing matters as much as genetics. Transparency sells — share test certificates, herd photos and the farm's story. Buyers on marketplaces like Farmeco filter specifically for A2/A2 certified listings.",
       "The shift isn't overnight. If you're starting a new herd, buy A2/A2-verified animals from the outset and insist on verified genetics in every breeding decision.",
       "Dairy markets reward differentiation. The farms that build A2/A2 status today are the ones charging premium prices tomorrow.",
     ],

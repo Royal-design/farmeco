@@ -79,7 +79,7 @@ export const useCartStore = create<CartState>()(
       closeCart: () => set({ isOpen: false }),
     }),
     {
-      name: "pasture.cart",
+      name: "farmeco.cart",
       partialize: (state) => ({ items: state.items }),
     }
   )

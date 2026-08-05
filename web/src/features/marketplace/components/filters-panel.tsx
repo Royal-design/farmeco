@@ -150,7 +150,7 @@ function FiltersPanel({ filters, onChange, resultCount }: FiltersProps) {
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-xs text-muted-foreground">
-              $
+              ₦
             </span>
             <Input
               type="number"
@@ -168,7 +168,7 @@ function FiltersPanel({ filters, onChange, resultCount }: FiltersProps) {
           <span className="text-muted-foreground">–</span>
           <div className="relative flex-1">
             <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-xs text-muted-foreground">
-              $
+              ₦
             </span>
             <Input
               type="number"

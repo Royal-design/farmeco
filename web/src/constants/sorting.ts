@@ -8,4 +8,4 @@ export const sortOptions = [
 
 export const pageSizes = [12, 24, 48] as const
 
-export const priceBounds = { min: 0, max: 6000, step: 100 }
+export const priceBounds = { min: 0, max: 2500000, step: 50000 }

@@ -22,7 +22,7 @@ function Testimonials() {
         <SectionHeading
           align="center"
           eyebrow="Testimonials"
-          title="Farmers trust Pasture & Co."
+          title="Farmers trust Farmeco"
           description="Tens of thousands of animals moved between farmers who love the marketplace."
           className="mb-12"
         />

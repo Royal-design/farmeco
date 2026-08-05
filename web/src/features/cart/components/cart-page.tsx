@@ -212,7 +212,7 @@ function CartPage() {
 
             <ul className="flex flex-col gap-2 border-t pt-4 text-xs text-muted-foreground">
               <li className="flex items-center gap-2">
-                <ShieldCheckIcon className="size-3.5 text-brand" /> Secure payment processed by Pasture & Co.
+                <ShieldCheckIcon className="size-3.5 text-brand" /> Secure payment processed by Farmeco
               </li>
               <li className="flex items-center gap-2">
                 <TruckIcon className="size-3.5 text-brand" /> Live-animal delivery with licensed hauliers

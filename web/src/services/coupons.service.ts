@@ -27,7 +27,7 @@ export const couponsService = {
     if (subtotal < coupon.minOrder) {
       return {
         valid: false,
-        message: `This coupon requires a minimum order of $${coupon.minOrder}.`,
+        message: `This coupon requires a minimum order of ₦${coupon.minOrder}.`,
       }
     }
     return { valid: true, coupon }

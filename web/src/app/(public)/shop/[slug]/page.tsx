@@ -11,8 +11,12 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  const products = await productsService.getProducts({ pageSize: 100 })
-  return products.items.map((product) => ({ slug: product.slug }))
+  try {
+    const products = await productsService.getProducts({ pageSize: 100 })
+    return products.items.map((product) => ({ slug: product.slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({

@@ -16,8 +16,12 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  const posts = await blogService.getPosts({ pageSize: 100 })
-  return posts.items.map((post) => ({ slug: post.slug }))
+  try {
+    const posts = await blogService.getPosts({ pageSize: 100 })
+    return posts.items.map((post) => ({ slug: post.slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({

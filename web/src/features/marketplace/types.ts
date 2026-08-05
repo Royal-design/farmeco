@@ -1,4 +1,5 @@
 import type { ProductBadge } from "@/types/catalog"
+import { priceBounds } from "@/constants/sorting"
 
 export interface MarketplaceFilters {
   category: string
@@ -16,8 +17,8 @@ export const defaultFilters: MarketplaceFilters = {
   category: "all",
   search: "",
   sort: "popular",
-  minPrice: 0,
-  maxPrice: 6000,
+  minPrice: priceBounds.min,
+  maxPrice: priceBounds.max,
   rating: 0,
   inStock: false,
   badge: "",
@@ -37,4 +38,5 @@ export const badgeOptions: Array<{ value: ProductBadge; label: string }> = [
   { value: "organic", label: "Organic" },
   { value: "sale", label: "On sale" },
   { value: "certified", label: "Certified" },
+  { value: "top", label: "Top" },
 ]

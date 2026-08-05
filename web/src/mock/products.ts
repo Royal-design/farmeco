@@ -745,6 +745,7 @@ export const products: Product[] = seeds.map((seed) => ({
   farm: seed.farm,
   sold: seed.sold,
   createdAt: seed.createdAt,
+  status: "published",
   specs: seed.specs,
   tags: seed.tags,
 }))

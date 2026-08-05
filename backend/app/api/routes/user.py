@@ -65,7 +65,7 @@ def update_avatar(
 # GET ALL USERS (ADMIN)
 # -------------------------
 @router.get(
-    "/",
+    "",
     response_model=SuccessResponse[list[UserResponse]],
     dependencies=[Depends(get_current_admin_user)],
 )

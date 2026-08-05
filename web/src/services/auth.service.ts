@@ -1,6 +1,11 @@
-import type { AuthSession, User } from "@/types/user"
-import { currentUser, mockUsers } from "@/mock/users"
-import { mockRequest } from "@/services/request"
+import type { AuthSession } from "@/types/user"
+import { api } from "@/lib/http"
+import {
+  clearStoredSession,
+  getStoredSession,
+  setStoredSession,
+} from "@/lib/session"
+import { mapUser, type RawUser } from "@/services/mappers"
 
 export interface LoginCredentials {
   email: string
@@ -11,6 +16,7 @@ export interface RegisterPayload {
   name: string
   email: string
   password: string
+  phone?: string
 }
 
 export interface ForgotPasswordPayload {
@@ -22,83 +28,80 @@ export interface ResetPasswordPayload {
   password: string
 }
 
-const SESSION_KEY = "farmeco.session"
-
-function buildSession(user: User): AuthSession {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-  return {
-    user,
-    token: `mock-token-${user.id}-${Date.now()}`,
-    expiresAt,
-  }
+interface RawAuthPayload {
+  user: RawUser
+  access_token: string
+  refresh_token: string
+  token_type: string
 }
 
-function persistSession(session: AuthSession) {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+function toSession(raw: RawAuthPayload): AuthSession {
+  const session: AuthSession = {
+    user: mapUser(raw.user),
+    accessToken: raw.access_token,
+    refreshToken: raw.refresh_token,
+    tokenType: raw.token_type,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   }
+  setStoredSession(session)
   return session
 }
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthSession> {
-    await mockRequest(undefined, 650)
-    if (!credentials.email.includes("@")) {
-      throw new Error("Invalid email address.")
-    }
-    if (credentials.password.length < 6) {
-      throw new Error("Invalid email or password.")
-    }
-    return persistSession(buildSession(currentUser))
+    const { data } = await api.post<RawAuthPayload>("/auth/login", credentials)
+    return toSession(data)
   },
 
   async register(payload: RegisterPayload): Promise<AuthSession> {
-    await mockRequest(undefined, 800)
-    const user: User = {
-      ...currentUser,
-      id: `u-${Date.now()}`,
+    const { data } = await api.post<RawAuthPayload>("/auth/register", {
       name: payload.name,
       email: payload.email,
-    }
-    return persistSession(buildSession(user))
+      phone: payload.phone ?? null,
+      password: payload.password,
+    })
+    return toSession(data)
+  },
+
+  async googleLogin(accessToken: string): Promise<AuthSession> {
+    const { data } = await api.post<RawAuthPayload>("/auth/google", {
+      access_token: accessToken,
+    })
+    return toSession(data)
   },
 
   async getSession(): Promise<AuthSession | null> {
-    if (typeof window !== "undefined") {
-      const raw = window.localStorage.getItem(SESSION_KEY)
-      if (raw) {
-        try {
-          const session = JSON.parse(raw) as AuthSession
-          if (new Date(session.expiresAt) > new Date()) {
-            return session
-          }
-          window.localStorage.removeItem(SESSION_KEY)
-        } catch {
-          window.localStorage.removeItem(SESSION_KEY)
-        }
-      }
+    const stored = getStoredSession()
+    if (!stored) {
+      return null
     }
-    return null
+    return {
+      user: stored.user,
+      accessToken: stored.accessToken,
+      refreshToken: stored.refreshToken,
+      expiresAt: stored.expiresAt,
+    }
   },
 
   async logout(): Promise<void> {
-    await mockRequest(undefined, 200)
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(SESSION_KEY)
+    const stored = getStoredSession()
+    try {
+      await api.post("/auth/logout", stored ? { refresh_token: stored.refreshToken } : undefined)
+    } catch {
+      // ignore — the session is always cleared locally
     }
+    clearStoredSession()
   },
 
   async forgotPassword(payload: ForgotPasswordPayload): Promise<{ sentTo: string }> {
-    await mockRequest(undefined, 600)
+    await api.post("/auth/forgot-password", { email: payload.email })
     return { sentTo: payload.email }
   },
 
   async resetPassword(payload: ResetPasswordPayload): Promise<void> {
-    await mockRequest(undefined, 600)
-    if (!payload.token) {
-      throw new Error("Reset token is invalid or has expired.")
-    }
+    await api.post("/auth/reset-password", {
+      token: payload.token,
+      new_password: payload.password,
+    })
   },
 }
-
-export { mockUsers }

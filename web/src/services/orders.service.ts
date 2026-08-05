@@ -1,7 +1,8 @@
-import type { Order, OrderStatus } from "@/types/order"
 import type { Paginated, QueryParams } from "@/types/api"
-import { mockOrders, fillOrderImages } from "@/mock/orders"
-import { mockRequest, paginateData } from "@/services/request"
+import { toPaginated } from "@/types/api"
+import type { Order, OrderStatus, ShippingAddress } from "@/types/order"
+import { api } from "@/lib/http"
+import { mapOrder, type RawOrder } from "@/services/mappers"
 
 export interface OrderQuery extends QueryParams {
   status?: OrderStatus | "all"
@@ -12,72 +13,87 @@ export interface CreateOrderInput {
   items: Array<{ productId: string; quantity: number }>
   paymentMethod: Order["paymentMethod"]
   couponCode?: string
-  shippingAddress: Order["shippingAddress"]
+  shippingAddress: ShippingAddress
   notes?: string
-}
-
-function hydrate(orders: Order[]): Order[] {
-  return orders.map(fillOrderImages)
 }
 
 export const ordersService = {
   async getOrders(params?: OrderQuery): Promise<Paginated<Order>> {
-    let result = hydrate(mockOrders)
-    if (params?.status && params.status !== "all") {
-      result = result.filter((order) => order.status === params.status)
-    }
-    if (params?.search) {
-      const term = params.search.toLowerCase()
-      result = result.filter(
-        (order) =>
-          order.number.toLowerCase().includes(term) ||
-          order.items.some((item) => item.name.toLowerCase().includes(term))
-      )
-    }
-    return mockRequest(paginateData(result, params))
+    const { data, meta } = await api.get<RawOrder[]>("/orders", {
+      status: params?.status && params.status !== "all" ? params.status : undefined,
+      search: params?.search,
+      page: params?.page,
+      page_size: params?.pageSize,
+    })
+    return toPaginated(data.map(mapOrder), meta)
   },
 
   async getOrderById(id: string): Promise<Order | null> {
-    const order = mockOrders.find((o) => o.id === id) ?? null
-    return mockRequest(order ? fillOrderImages(order) : null, 200)
+    try {
+      const { data } = await api.get<RawOrder>(`/orders/${id}`)
+      return mapOrder(data)
+    } catch {
+      return null
+    }
   },
 
   async getRecentOrders(limit = 4): Promise<Order[]> {
-    return mockRequest(hydrate(mockOrders).slice(0, limit), 200)
+    const { data } = await api.get<RawOrder[]>("/orders/recent", { limit })
+    return data.map(mapOrder)
   },
 
   async getOrdersByStatus(status: OrderStatus): Promise<Order[]> {
-    return mockRequest(
-      hydrate(mockOrders.filter((o) => o.status === status)),
-      200
-    )
+    const { data } = await api.get<RawOrder[]>("/orders", { status, page_size: 100 })
+    return data.map(mapOrder)
+  },
+
+  async getAdminOrders(params?: OrderQuery): Promise<Paginated<Order>> {
+    const { data, meta } = await api.get<RawOrder[]>("/orders/all", {
+      status: params?.status && params.status !== "all" ? params.status : undefined,
+      search: params?.search,
+      page: params?.page,
+      page_size: params?.pageSize,
+    })
+    return toPaginated(data.map(mapOrder), meta)
+  },
+
+  async getSellerOrders(params?: OrderQuery): Promise<Paginated<Order>> {
+    const { data, meta } = await api.get<RawOrder[]>("/orders/seller", {
+      status: params?.status && params.status !== "all" ? params.status : undefined,
+      search: params?.search,
+      page: params?.page,
+      page_size: params?.pageSize,
+    })
+    return toPaginated(data.map(mapOrder), meta)
   },
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
-    const order: Order = {
-      id: `o-${Date.now()}`,
-      number: `PC-${Math.floor(10000 + Math.random() * 89999)}`,
-      status: "pending",
-      items: [],
-      subtotal: 0,
-      shipping: 0,
-      tax: 0,
-      discount: 0,
-      total: 0,
-      paymentMethod: input.paymentMethod,
-      shippingAddress: input.shippingAddress,
-      notes: input.notes,
-      couponCode: input.couponCode,
-      createdAt: new Date().toISOString(),
-    }
-    return mockRequest(order, 600)
+    const { data } = await api.post<RawOrder>("/orders", {
+      items: input.items,
+      payment_method: input.paymentMethod,
+      coupon_code: input.couponCode ?? null,
+      shipping_address: {
+        full_name: input.shippingAddress.fullName,
+        phone: input.shippingAddress.phone,
+        line1: input.shippingAddress.line1,
+        line2: input.shippingAddress.line2 ?? null,
+        city: input.shippingAddress.city,
+        state: input.shippingAddress.state,
+        postal_code: input.shippingAddress.postalCode,
+        country: input.shippingAddress.country,
+      },
+      notes: input.notes ?? null,
+    })
+    return mapOrder(data)
   },
 
-  async cancelOrder(id: string): Promise<Order | null> {
-    return mockRequest(null, 400)
+  async cancelOrder(id: string): Promise<Order> {
+    const { data } = await api.post<RawOrder>(`/orders/${id}/cancel`)
+    return mapOrder(data)
   },
 
-  async updateOrderStatus(id: string, status: OrderStatus): Promise<Order | null> {
-    return mockRequest(null, 300)
+  async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
+    const { data } = await api.patch<RawOrder>(`/orders/${id}/status`, { status })
+    return mapOrder(data)
   },
 }

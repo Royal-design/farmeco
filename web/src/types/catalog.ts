@@ -16,7 +16,7 @@ export interface ProductSpec {
   value: string
 }
 
-export type ProductBadge = "featured" | "best-seller" | "new" | "organic" | "sale" | "certified"
+export type ProductBadge = "featured" | "best-seller" | "new" | "organic" | "sale" | "certified" | "top"
 
 export interface ProductReview {
   id: string
@@ -50,6 +50,7 @@ export interface Product {
   farm: string
   sold: number
   createdAt: string
+  status: "draft" | "published" | "archived"
   specs: ProductSpec[]
   tags: string[]
 }

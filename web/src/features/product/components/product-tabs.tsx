@@ -102,7 +102,11 @@ function ProductTabs({ product }: ProductTabsProps) {
                 Write a review
               </h3>
               <div className="rounded-2xl border border-border bg-card p-5">
-                <ReviewForm productId={product.id} productName={product.name} />
+                <ReviewForm
+                  productId={product.id}
+                  productName={product.name}
+                  productSlug={product.slug}
+                />
               </div>
             </div>
           </div>

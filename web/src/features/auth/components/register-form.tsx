@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 import { registerSchema, type RegisterFormValues } from "@/schemas/auth.schema"
 import { useAuthStore } from "@/store/auth-store"
+import { GoogleSignInButton } from "@/features/auth/components/google-signin-button"
 import { Button, ButtonLink } from "@/components/ui/button"
 import {
   Field,
@@ -207,6 +208,8 @@ function RegisterForm() {
           "Create account"
         )}
       </Button>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

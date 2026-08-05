@@ -1,9 +1,10 @@
 import type { ProductReview } from "@/types/catalog"
-import { mockRequest } from "@/services/request"
+import { api } from "@/lib/http"
+import { mapReview, type RawReview } from "@/services/mappers"
 
 export interface SubmitReviewInput {
   productId: string
-  author: string
+  author?: string
   rating: number
   title: string
   comment: string
@@ -11,23 +12,27 @@ export interface SubmitReviewInput {
 
 export const reviewsService = {
   async submitReview(input: SubmitReviewInput): Promise<ProductReview> {
-    const review: ProductReview = {
-      id: `r-${Date.now()}`,
-      author: input.author,
-      authorInitials: input.author
-        .split(/\s+/)
-        .map((part) => part[0]?.toUpperCase() ?? "")
-        .join(""),
+    const { data } = await api.post<RawReview>("/reviews", {
+      product_id: input.productId,
       rating: input.rating,
       title: input.title,
       comment: input.comment,
-      date: new Date().toISOString().slice(0, 10),
-      helpfulCount: 0,
-    }
-    return mockRequest(review, 600)
+    })
+    return mapReview(data)
   },
 
   async reportHelpful(reviewId: string): Promise<void> {
-    await mockRequest(undefined, 250)
+    await api.post(`/reviews/${reviewId}/helpful`)
+  },
+
+  async getProductReviews(productId: string): Promise<ProductReview[]> {
+    const { data } = await api.get<RawReview[]>(`/reviews/product/${productId}`, {
+      page_size: 50,
+    })
+    return data.map(mapReview)
+  },
+
+  async deleteReview(reviewId: string): Promise<void> {
+    await api.delete(`/reviews/${reviewId}`)
   },
 }

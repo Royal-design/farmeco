@@ -89,13 +89,16 @@ function ProductCard({
           {product.badges.slice(0, 2).map((badge) => {
             const meta = badgeMeta[badge]
             return (
-              <Badge key={badge} variant={meta.tone as never}>
+              <Badge
+                key={badge}
+                className="bg-background/85 text-foreground ring-foreground/15 backdrop-blur-md"
+              >
                 {meta.label}
               </Badge>
             )
           })}
           {hasDiscount && (
-            <Badge variant="clay">
+            <Badge className="bg-clay text-white ring-white/20 backdrop-blur-md">
               -
               {Math.round(
                 ((1 - product.price / (product.compareAtPrice ?? product.price)) *
@@ -111,7 +114,7 @@ function ProductCard({
           onClick={handleWishlist}
           aria-pressed={isWishlisted}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow-sm backdrop-blur-md transition-all duration-300 hover:bg-background focus-visible:opacity-100 group-hover:opacity-100 data-[pressed=true]:opacity-100"
+          className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full bg-background/85 text-foreground shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-110 hover:bg-background focus-visible:ring-2 focus-visible:ring-ring/50 data-[pressed=true]:bg-clay/15"
           data-pressed={isWishlisted}
         >
           <HeartIcon

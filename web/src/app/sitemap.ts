@@ -18,21 +18,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/faq`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ]
 
-  const products = await productsService.getProducts({ pageSize: 100 })
-  const productRoutes: MetadataRoute.Sitemap = products.items.map((product) => ({
-    url: `${baseUrl}/shop/${product.slug}`,
-    lastModified: new Date(product.createdAt),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }))
+  const routes: MetadataRoute.Sitemap = [...staticRoutes]
 
-  const posts = await blogService.getPosts({ pageSize: 100 })
-  const blogRoutes: MetadataRoute.Sitemap = posts.items.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt),
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }))
+  try {
+    const products = await productsService.getProducts({ pageSize: 100 })
+    routes.push(
+      ...products.items.map((product) => ({
+        url: `${baseUrl}/shop/${product.slug}`,
+        lastModified: new Date(product.createdAt),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }))
+    )
+  } catch {
+    // skip dynamic product routes if the API is unreachable
+  }
 
-  return [...staticRoutes, ...productRoutes, ...blogRoutes]
+  try {
+    const posts = await blogService.getPosts({ pageSize: 100 })
+    routes.push(
+      ...posts.items.map((post) => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: new Date(post.publishedAt),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }))
+    )
+  } catch {
+    // skip dynamic blog routes if the API is unreachable
+  }
+
+  return routes
 }

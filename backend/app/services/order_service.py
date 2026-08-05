@@ -91,6 +91,35 @@ class OrderService:
         }
 
     # -------------------------
+    # GET SELLER ORDERS
+    # -------------------------
+    def get_seller_orders(
+        self,
+        seller_id: UUID,
+        status: OrderStatus | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ):
+        orders, total, total_pages = self.order_repository.get_orders_by_seller(
+            seller_id,
+            status=status,
+            search=search,
+            page=page,
+            page_size=page_size,
+        )
+
+        return {
+            "data": orders,
+            "meta": PaginationMeta(
+                total=total,
+                page=page,
+                page_size=page_size,
+                total_pages=total_pages,
+            ).model_dump(),
+        }
+
+    # -------------------------
     # GET ORDER BY ID
     # -------------------------
     def get_order_by_id(self, order_id: UUID, current_user: User) -> Order:

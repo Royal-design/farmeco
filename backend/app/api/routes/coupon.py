@@ -32,7 +32,7 @@ def validate_coupon(
 # GET ALL COUPONS (ADMIN)
 # -------------------------
 @router.get(
-    "/",
+    "",
     response_model=SuccessResponse[list[CouponResponse]],
     dependencies=[Depends(get_current_admin_user)],
 )
@@ -51,7 +51,7 @@ def get_coupons(
 # CREATE COUPON (ADMIN)
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[CouponResponse],
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_admin_user)],

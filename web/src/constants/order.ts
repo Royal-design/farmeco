@@ -29,6 +29,7 @@ export const badgeMeta: Record<ProductBadge, { label: string; tone: string }> = 
   organic: { label: "Organic", tone: "brand" },
   sale: { label: "Sale", tone: "clay" },
   certified: { label: "Certified", tone: "brand" },
+  top: { label: "Top", tone: "brand" },
 }
 
 export const FREE_SHIPPING_THRESHOLD = 200000

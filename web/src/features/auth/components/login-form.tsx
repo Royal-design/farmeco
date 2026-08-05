@@ -9,6 +9,7 @@ import { toast } from "sonner"
 
 import { loginSchema, type LoginFormValues } from "@/schemas/auth.schema"
 import { useAuthStore } from "@/store/auth-store"
+import { GoogleSignInButton } from "@/features/auth/components/google-signin-button"
 import { Button, ButtonLink } from "@/components/ui/button"
 import {
   Field,
@@ -137,6 +138,8 @@ function LoginForm() {
           "Sign in"
         )}
       </Button>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-muted-foreground">
         New to Pasture & Co.?{" "}

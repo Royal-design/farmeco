@@ -195,10 +195,18 @@ def get_or_create_admin(db):
 def seed_categories(db):
     created = 0
     for data in CATEGORIES:
+        from_color, to_color = PALETTES[data["accent"]]
+        image = svg_data_uri(data["emoji"], from_color, to_color)
+
         exists = db.query(Category).filter(Category.slug == data["slug"]).first()
         if exists:
+            if not exists.image:
+                exists.image = image
+                exists.emoji = data["emoji"]
+                exists.accent = data["accent"]
             continue
-        db.add(Category(**data))
+
+        db.add(Category(**data, image=image))
         created += 1
     db.commit()
     return created

@@ -1,17 +1,21 @@
 "use client"
 
 import { create } from "zustand"
+
 import type { User } from "@/types/user"
 import { authService } from "@/services/auth.service"
+import { clearStoredSession, getStoredSession, updateStoredUser } from "@/lib/session"
 
 type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated"
 
 interface AuthState {
   user: User | null
-  token: string | null
+  accessToken: string | null
+  refreshToken: string | null
   status: AuthStatus
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string) => Promise<void>
+  register: (name: string, email: string, password: string, phone?: string) => Promise<void>
+  googleLogin: (accessToken: string) => Promise<void>
   logout: () => Promise<void>
   hydrate: () => Promise<void>
   setUser: (user: User) => void
@@ -19,7 +23,8 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   status: "idle",
 
   login: async (email, password) => {
@@ -28,7 +33,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const session = await authService.login({ email, password })
       set({
         user: session.user,
-        token: session.token,
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
         status: "authenticated",
       })
     } catch (error) {
@@ -37,13 +43,30 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (name, email, password) => {
+  register: async (name, email, password, phone) => {
     set({ status: "loading" })
     try {
-      const session = await authService.register({ name, email, password })
+      const session = await authService.register({ name, email, password, phone })
       set({
         user: session.user,
-        token: session.token,
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
+        status: "authenticated",
+      })
+    } catch (error) {
+      set({ status: "unauthenticated" })
+      throw error
+    }
+  },
+
+  googleLogin: async (accessToken) => {
+    set({ status: "loading" })
+    try {
+      const session = await authService.googleLogin(accessToken)
+      set({
+        user: session.user,
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
         status: "authenticated",
       })
     } catch (error) {
@@ -53,22 +76,31 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await authService.logout()
-    set({ user: null, token: null, status: "unauthenticated" })
+    try {
+      await authService.logout()
+    } catch {
+      // still clear locally
+    }
+    clearStoredSession()
+    set({ user: null, accessToken: null, refreshToken: null, status: "unauthenticated" })
   },
 
   hydrate: async () => {
-    const session = await authService.getSession()
+    const session = getStoredSession()
     if (session) {
       set({
         user: session.user,
-        token: session.token,
+        accessToken: session.accessToken,
+        refreshToken: session.refreshToken,
         status: "authenticated",
       })
     } else {
-      set({ user: null, token: null, status: "unauthenticated" })
+      set({ user: null, accessToken: null, refreshToken: null, status: "unauthenticated" })
     }
   },
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    updateStoredUser(user)
+    set({ user })
+  },
 }))

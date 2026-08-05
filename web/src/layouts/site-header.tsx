@@ -13,11 +13,12 @@ import {
   PackageIcon,
   SettingsIcon,
   LayoutDashboardIcon,
-  ChevronRightIcon,
+  StoreIcon,
+  ShieldIcon,
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { mainNav, siteConfig } from "@/config/site"
+import { mainNav } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { useUIStore } from "@/store/ui-store"
 import { useAuthStore } from "@/store/auth-store"
@@ -125,6 +126,23 @@ function AccountMenu() {
             Settings
           </MenuItem>
           <MenuSeparator />
+          {(user.role === "admin" || user.role === "seller") && (
+            <>
+              {user.role === "admin" && (
+                <MenuItem onClick={() => router.push("/admin")}>
+                  <ShieldIcon className="size-4 text-muted-foreground" />
+                  Admin dashboard
+                </MenuItem>
+              )}
+              {user.role === "seller" && (
+                <MenuItem onClick={() => router.push("/seller")}>
+                  <StoreIcon className="size-4 text-muted-foreground" />
+                  Seller dashboard
+                </MenuItem>
+              )}
+              <MenuSeparator />
+            </>
+          )}
           <MenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
             <LogOutIcon className="size-4" />
             Sign out

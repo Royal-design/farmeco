@@ -1,10 +1,15 @@
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "https://farmeco.example.com"
+).replace(/\/$/, "")
+
 export const siteConfig = {
   name: "Farmeco",
   shortName: "Farmeco",
   tagline: "The modern marketplace for livestock & poultry",
   description:
     "Buy and sell premium cattle, goats, sheep, pigs, poultry and farm essentials with trusted local farms. Verified sellers, health-certified animals, and doorstep delivery.",
-  url: "https://farmeco.example.com",
+  url: siteUrl,
   ogImage: "/og/cover.svg",
   links: {
     twitter: "https://twitter.com",

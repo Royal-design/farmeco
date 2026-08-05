@@ -35,6 +35,7 @@ class ProductRepository:
         in_stock: bool = False,
         ids: list[UUID] | None = None,
         status: ProductStatus | None = None,
+        seller_id: UUID | None = None,
     ):
         if category and category != "all":
             query = query.join(Category, Product.category_id == Category.id).filter(
@@ -75,6 +76,9 @@ class ProductRepository:
         if status:
             query = query.filter(Product.status == status)
 
+        if seller_id:
+            query = query.filter(Product.seller_id == seller_id)
+
         return query
 
     def get_all_products(
@@ -89,6 +93,7 @@ class ProductRepository:
         in_stock: bool = False,
         ids: list[UUID] | None = None,
         status: ProductStatus = ProductStatus.PUBLISHED,
+        seller_id: UUID | None = None,
         page: int = 1,
         page_size: int = 12,
     ) -> tuple[list[Product], int, int]:
@@ -105,6 +110,7 @@ class ProductRepository:
             in_stock=in_stock,
             ids=ids,
             status=status,
+            seller_id=seller_id,
         )
 
         total = query.count()

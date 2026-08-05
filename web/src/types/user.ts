@@ -27,6 +27,8 @@ export interface User {
 
 export interface AuthSession {
   user: User
-  token: string
-  expiresAt: string
+  accessToken: string
+  refreshToken: string
+  tokenType?: string
+  expiresAt?: string
 }

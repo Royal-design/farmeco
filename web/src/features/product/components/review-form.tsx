@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { reviewSchema, type ReviewFormValues } from "@/schemas/review.schema"
 import { reviewsService } from "@/services/reviews.service"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button, ButtonLink } from "@/components/ui/button"
 import {
   Field,
   FieldLabel,
@@ -24,6 +24,7 @@ import { useAuthStore } from "@/store/auth-store"
 interface ReviewFormProps {
   productId: string
   productName: string
+  productSlug: string
 }
 
 function StarPicker({
@@ -66,8 +67,9 @@ function StarPicker({
   )
 }
 
-function ReviewForm({ productId, productName }: ReviewFormProps) {
+function ReviewForm({ productId, productName, productSlug }: ReviewFormProps) {
   const user = useAuthStore((state) => state.user)
+  const status = useAuthStore((state) => state.status)
   const queryClient = useQueryClient()
 
   const form = useForm<ReviewFormValues>({
@@ -95,12 +97,30 @@ function ReviewForm({ productId, productName }: ReviewFormProps) {
   const onSubmit = form.handleSubmit((values) => {
     mutation.mutate({
       productId,
-      author: user?.name ?? "Verified buyer",
       rating: values.rating,
       title: values.title,
       comment: values.comment,
     })
   })
+
+  if (status !== "authenticated" || !user) {
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <div className="flex items-center gap-1 text-honey">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <StarIcon key={star} className="size-5 fill-current text-honey/25" />
+          ))}
+        </div>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Sign in to rate this {productName} and share your experience with
+          other farmers.
+        </p>
+        <ButtonLink href={`/login?redirect=/shop/${productSlug}`} size="lg">
+          Sign in to leave a review
+        </ButtonLink>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">

@@ -87,6 +87,38 @@ class OrderRepository:
         total_pages = ceil(total / page_size) if page_size else 0
         return orders, total, total_pages
 
+    def get_orders_by_seller(
+        self,
+        seller_id: UUID,
+        status: OrderStatus | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> tuple[list[Order], int, int]:
+        query = self._query().filter(
+            Order.items.contains([{"seller_id": str(seller_id)}])
+        )
+
+        if status:
+            query = query.filter(Order.status == status)
+
+        if search:
+            query = query.filter(Order.number.ilike(f"%{search}%"))
+
+        total = query.count()
+
+        offset = (page - 1) * page_size
+        orders = (
+            query
+            .order_by(Order.created_at.desc())
+            .offset(offset)
+            .limit(page_size)
+            .all()
+        )
+
+        total_pages = ceil(total / page_size) if page_size else 0
+        return orders, total, total_pages
+
     def create_order(self, order: Order) -> Order:
         self.db.add(order)
         self.db.commit()

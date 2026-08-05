@@ -40,7 +40,7 @@ def get_reviews(
 # CREATE REVIEW
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[ReviewResponse],
     status_code=status.HTTP_201_CREATED,
 )

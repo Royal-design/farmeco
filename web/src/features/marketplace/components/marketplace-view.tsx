@@ -74,10 +74,9 @@ function MarketplaceView() {
     [filters, debouncedSearch]
   )
 
-  const { data, isLoading, isError, isFetching } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["products", query],
     queryFn: () => productsService.getProducts(query),
-    placeholderData: (previous) => previous,
   })
 
   const updateFilters = (patch: Partial<MarketplaceFilters>) => {
@@ -203,6 +202,7 @@ function MarketplaceView() {
             <>
               <Stagger
                 key={JSON.stringify(query)}
+                animateOnMount
                 className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
               >
                 {data.items.map((product) => (

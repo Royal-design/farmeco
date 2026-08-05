@@ -39,17 +39,36 @@ export const metadata: Metadata = {
     "farm marketplace",
     "livestock auction",
     "healthy farm animals",
+    "farmeco",
+    "buy livestock online",
+    "farmers market",
   ],
-  authors: [{ name: siteConfig.name }],
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  formatDetection: { email: false, address: false, telephone: false },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "en_NG",
     url: siteConfig.url,
     siteName: siteConfig.name,
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: siteConfig.name }],
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -65,9 +84,9 @@ export const metadata: Metadata = {
       follow: true,
       "max-image-preview": "large",
       "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
-  category: "e-commerce",
   alternates: {
     canonical: "/",
   },
@@ -97,6 +116,44 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-svh font-sans">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  name: siteConfig.name,
+                  url: siteConfig.url,
+                  logo: `${siteConfig.url}/icon.svg`,
+                  description: siteConfig.description,
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    telephone: siteConfig.phone,
+                    email: siteConfig.supportEmail,
+                    contactType: "customer service",
+                    availableLanguage: "en",
+                  },
+                },
+                {
+                  "@type": "WebSite",
+                  name: siteConfig.name,
+                  url: siteConfig.url,
+                  description: siteConfig.description,
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                      "@type": "EntryPoint",
+                      urlTemplate: `${siteConfig.url}/shop?search={search_term_string}`,
+                    },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

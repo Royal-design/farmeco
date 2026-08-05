@@ -1,45 +1,71 @@
 import type { Category } from "@/types/catalog"
-import type { Paginated, QueryParams } from "@/types/api"
-import { categories } from "@/mock/categories"
-import { mockRequest, paginateData } from "@/services/request"
+import { api } from "@/lib/http"
+import { mapCategory, type RawCategory } from "@/services/mappers"
+
+export interface CategoryInput {
+  name: string
+  slug?: string
+  shortDescription: string
+  description: string
+  image?: string
+  emoji?: string
+  accent?: string
+  featured?: boolean
+}
+
+function toPayload(input: Partial<CategoryInput>): Record<string, unknown> {
+  return {
+    name: input.name,
+    slug: input.slug,
+    short_description: input.shortDescription,
+    description: input.description,
+    image: input.image,
+    emoji: input.emoji,
+    accent: input.accent,
+    featured: input.featured,
+  }
+}
 
 export const categoriesService = {
   async getCategories(): Promise<Category[]> {
-    return mockRequest(categories, 200)
+    const { data } = await api.get<RawCategory[]>("/categories")
+    return data.map(mapCategory)
   },
 
   async getFeaturedCategories(): Promise<Category[]> {
-    return mockRequest(categories.filter((c) => c.featured), 160)
+    const { data } = await api.get<RawCategory[]>("/categories/featured")
+    return data.map(mapCategory)
   },
 
   async getCategory(slug: string): Promise<Category | null> {
-    const category = categories.find((c) => c.slug === slug) ?? null
-    return mockRequest(category, 200)
+    try {
+      const { data } = await api.get<RawCategory>(`/categories/slug/${slug}`)
+      return mapCategory(data)
+    } catch {
+      return null
+    }
   },
 
   async getCategoryById(id: string): Promise<Category | null> {
-    const category = categories.find((c) => c.id === id) ?? null
-    return mockRequest(category, 120)
+    try {
+      const { data } = await api.get<RawCategory>(`/categories/${id}`)
+      return mapCategory(data)
+    } catch {
+      return null
+    }
   },
 
-  async getCategoriesPage(params?: QueryParams): Promise<Paginated<Category>> {
-    return mockRequest(paginateData(categories, params))
+  async createCategory(input: CategoryInput): Promise<Category> {
+    const { data } = await api.post<RawCategory>("/categories", toPayload(input))
+    return mapCategory(data)
   },
 
-  async createCategory(data: Partial<Category>): Promise<Category> {
-    const category = {
-      ...data,
-      id: `cat-${Date.now()}`,
-      productCount: 0,
-    } as Category
-    return mockRequest(category, 400)
-  },
-
-  async updateCategory(id: string, data: Partial<Category>): Promise<Category | null> {
-    return mockRequest(null, 400)
+  async updateCategory(id: string, input: Partial<CategoryInput>): Promise<Category> {
+    const { data } = await api.put<RawCategory>(`/categories/${id}`, toPayload(input))
+    return mapCategory(data)
   },
 
   async deleteCategory(id: string): Promise<void> {
-    await mockRequest(undefined, 300)
+    await api.delete(`/categories/${id}`)
   },
 }

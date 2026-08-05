@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.exceptions import AppException
 import app.models
 
-app = FastAPI()
+app = FastAPI(redirect_slashes=False)
 
 allowed_origins = {
     settings.frontend_url.rstrip("/"),

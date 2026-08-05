@@ -22,7 +22,7 @@ function Marquee({
       className={cn("flex overflow-hidden", mask && "mask-fade-x", className)}
     >
       <div
-        className="flex shrink-0 animate-marquee items-center"
+        className="flex shrink-0 animate-marquee items-center hover:[animation-play-state:paused]"
         style={{
           animationDuration: `${speed}s`,
           animationDirection: reverse ? "reverse" : "normal",

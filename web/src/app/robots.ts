@@ -8,9 +8,21 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/account", "/checkout", "/cart", "/wishlist", "/login", "/register", "/forgot-password", "/reset-password"],
+        disallow: [
+          "/account",
+          "/admin",
+          "/seller",
+          "/checkout",
+          "/cart",
+          "/wishlist",
+          "/login",
+          "/register",
+          "/forgot-password",
+          "/reset-password",
+        ],
       },
     ],
     sitemap: `${siteConfig.url}/sitemap.xml`,
+    host: siteConfig.url.replace(/^https?:\/\//, ""),
   }
 }

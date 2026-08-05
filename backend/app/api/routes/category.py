@@ -14,7 +14,7 @@ router = APIRouter()
 # -------------------------
 # GET ALL CATEGORIES
 # -------------------------
-@router.get("/", response_model=SuccessResponse[list[CategoryResponse]])
+@router.get("", response_model=SuccessResponse[list[CategoryResponse]])
 def get_categories(
     featured: bool | None = Query(None),
     search: str | None = Query(None),
@@ -82,7 +82,7 @@ def get_category_by_id(
 # CREATE CATEGORY (ADMIN)
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[CategoryResponse],
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_admin_user)],

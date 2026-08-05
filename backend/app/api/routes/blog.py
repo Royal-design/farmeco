@@ -17,7 +17,7 @@ router = APIRouter()
 # -------------------------
 # GET ALL POSTS
 # -------------------------
-@router.get("/", response_model=SuccessResponse[list[BlogPostResponse]])
+@router.get("", response_model=SuccessResponse[list[BlogPostResponse]])
 def get_posts(
     category: str | None = Query(None),
     search: str | None = Query(None),
@@ -95,10 +95,26 @@ def get_post_by_slug(
 
 
 # -------------------------
+# GET POST BY ID
+# -------------------------
+@router.get("/{post_id}", response_model=SuccessResponse[BlogPostResponse])
+def get_post_by_id(
+    post_id: UUID,
+    blog_service: BlogService = Depends(get_blog_service),
+):
+    post = blog_service.get_post_by_id(post_id)
+
+    return SuccessResponse(
+        message="Post retrieved successfully",
+        data=post,
+    )
+
+
+# -------------------------
 # CREATE POST (ADMIN)
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[BlogPostResponse],
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_admin_user)],

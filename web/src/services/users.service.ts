@@ -1,7 +1,8 @@
-import type { User } from "@/types/user"
 import type { Paginated, QueryParams } from "@/types/api"
-import { currentUser, mockUsers } from "@/mock/users"
-import { mockRequest, paginateData } from "@/services/request"
+import { toPaginated } from "@/types/api"
+import type { User } from "@/types/user"
+import { api } from "@/lib/http"
+import { mapUser, type RawUser } from "@/services/mappers"
 
 export interface UpdateProfileInput {
   name?: string
@@ -15,35 +16,61 @@ export interface ChangePasswordInput {
   newPassword: string
 }
 
+export interface UsersQuery extends QueryParams {
+  search?: string
+}
+
 export const usersService = {
   async getMe(): Promise<User> {
-    return mockRequest(currentUser, 200)
+    const { data } = await api.get<RawUser>("/users/me")
+    return mapUser(data)
   },
 
   async updateMe(input: UpdateProfileInput): Promise<User> {
-    return mockRequest(
-      { ...currentUser, ...input, preferences: { ...currentUser.preferences, ...input.preferences } },
-      500
-    )
+    const { data } = await api.put<RawUser>("/users/me", {
+      name: input.name,
+      phone: input.phone ?? null,
+      address: input.address ?? undefined,
+      preferences: input.preferences ?? undefined,
+    })
+    return mapUser(data)
   },
 
   async changePassword(input: ChangePasswordInput): Promise<void> {
-    await mockRequest(undefined, 500)
-    if (input.currentPassword.length < 6) {
-      throw new Error("Current password is incorrect.")
-    }
+    await api.post("/auth/change-password", {
+      current_password: input.currentPassword,
+      new_password: input.newPassword,
+    })
   },
 
-  async updateAvatar(avatar: string): Promise<User> {
-    return mockRequest({ ...currentUser, avatar }, 300)
+  async updateAvatar(file: File): Promise<User> {
+    const formData = new FormData()
+    formData.append("avatar", file)
+    const { data } = await api.upload<RawUser>("/users/me/avatar", formData)
+    return mapUser(data)
   },
 
-  async getUsers(params?: QueryParams): Promise<Paginated<User>> {
-    return mockRequest(paginateData(mockUsers, params))
+  async getUsers(params?: UsersQuery): Promise<Paginated<User>> {
+    const { data, meta } = await api.get<RawUser[]>("/users", {
+      search: params?.search,
+      page: params?.page,
+      page_size: params?.pageSize,
+    })
+    return toPaginated(data.map(mapUser), meta)
   },
 
   async getUser(id: string): Promise<User | null> {
-    const user = mockUsers.find((u) => u.id === id) ?? null
-    return mockRequest(user, 200)
+    const { data } = await api.get<RawUser[]>("/users", { search: "", page_size: 100 })
+    const user = data.find((candidate) => candidate.id === id)
+    return user ? mapUser(user) : null
+  },
+
+  async updateUserRole(id: string, role: User["role"]): Promise<User> {
+    const { data } = await api.patch<RawUser>(`/users/${id}/role`, { role })
+    return mapUser(data)
+  },
+
+  async deleteUser(id: string): Promise<void> {
+    await api.delete(`/users/${id}`)
   },
 }

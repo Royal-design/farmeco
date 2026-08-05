@@ -3,9 +3,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
 
-from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.auth import get_current_admin_user, get_current_user
 from app.api.dependencies.services import get_order_service
-from app.models.enums import OrderStatus
+from app.core.exceptions import AppException
+from app.models.enums import OrderStatus, UserRole
 from app.models.user import User
 from app.schemas.order import (
     OrderCreateRequest,
@@ -21,7 +22,7 @@ router = APIRouter()
 # -------------------------
 # GET MY ORDERS
 # -------------------------
-@router.get("/", response_model=SuccessResponse[list[OrderResponse]])
+@router.get("", response_model=SuccessResponse[list[OrderResponse]])
 def get_my_orders(
     current_user: Annotated[User, Depends(get_current_user)],
     order_service: Annotated[OrderService, Depends(get_order_service)],
@@ -63,6 +64,69 @@ def get_recent_orders(
 
 
 # -------------------------
+# GET ALL ORDERS (ADMIN)
+# -------------------------
+@router.get(
+    "/all",
+    response_model=SuccessResponse[list[OrderResponse]],
+    dependencies=[Depends(get_current_admin_user)],
+)
+def get_all_orders(
+    order_service: Annotated[OrderService, Depends(get_order_service)],
+    status_filter: OrderStatus | None = Query(None, alias="status"),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+):
+    result = order_service.get_all_orders(
+        status=status_filter,
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
+
+    return SuccessResponse(
+        message="Orders retrieved successfully",
+        data=result["data"],
+        meta=result["meta"],
+    )
+
+
+# -------------------------
+# GET SELLER ORDERS
+# -------------------------
+@router.get("/seller", response_model=SuccessResponse[list[OrderResponse]])
+def get_seller_orders(
+    current_user: Annotated[User, Depends(get_current_user)],
+    order_service: Annotated[OrderService, Depends(get_order_service)],
+    status_filter: OrderStatus | None = Query(None, alias="status"),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+):
+    if current_user.role not in (UserRole.SELLER, UserRole.ADMIN):
+        raise AppException(
+            message="Seller privileges required",
+            status_code=403,
+            error_code="FORBIDDEN",
+        )
+
+    result = order_service.get_seller_orders(
+        seller_id=current_user.id,
+        status=status_filter,
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
+
+    return SuccessResponse(
+        message="Orders retrieved successfully",
+        data=result["data"],
+        meta=result["meta"],
+    )
+
+
+# -------------------------
 # GET ORDER BY ID
 # -------------------------
 @router.get("/{order_id}", response_model=SuccessResponse[OrderResponse])
@@ -83,7 +147,7 @@ def get_order(
 # CREATE ORDER
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[OrderResponse],
     status_code=status.HTTP_201_CREATED,
 )

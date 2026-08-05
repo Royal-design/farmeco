@@ -1,3 +1,4 @@
+import base64
 from uuid import UUID
 
 from slugify import slugify
@@ -6,6 +7,36 @@ from app.core.exceptions import AppException
 from app.models.category import Category
 from app.repositories.category_repository import CategoryRepository
 from app.schemas.category import CategoryCreate, CategoryUpdate
+
+CATEGORY_PALETTES = {
+    "cattle": ("#2f5d3f", "#7d8f4d"),
+    "goats-sheep": ("#4d7c58", "#a8895b"),
+    "pigs": ("#9a6a2f", "#c08a4a"),
+    "poultry": ("#3f7a82", "#8a5f99"),
+    "horses": ("#6b4e3a", "#8a6f5b"),
+    "rabbits": ("#7d5a8a", "#b59a6b"),
+    "supplies": ("#5a7a3f", "#c99a5b"),
+    "eggs-dairy": ("#b5913f", "#e8d9a0"),
+}
+
+DEFAULT_PALETTE = ("#4d7c58", "#a8895b")
+
+
+def _svg_image(emoji: str, accent: str | None) -> str:
+    from_color, to_color = CATEGORY_PALETTES.get(accent or "", DEFAULT_PALETTE)
+    svg = (
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>"
+        f"<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"
+        f"<stop offset='0%' stop-color='{from_color}'/>"
+        f"<stop offset='100%' stop-color='{to_color}'/>"
+        f"</linearGradient></defs>"
+        f"<rect width='800' height='600' fill='url(#g)'/>"
+        f"<circle cx='400' cy='300' r='190' fill='rgba(255,255,255,0.12)'/>"
+        f"<text x='400' y='360' font-size='230' text-anchor='middle'>{emoji or '🏷️'}</text>"
+        f"</svg>"
+    )
+    encoded = base64.b64encode(svg.encode("utf-8")).decode("ascii")
+    return f"data:image/svg+xml;base64,{encoded}"
 
 
 class CategoryService:
@@ -72,11 +103,10 @@ class CategoryService:
                 error_code="CATEGORY_ALREADY_EXISTS",
             )
 
-        db_category = Category(
-            **category.model_dump(exclude={"slug", "name"}),
-            name=name,
-            slug=slug,
-        )
+        payload = category.model_dump(exclude={"slug", "name"})
+        payload["image"] = category.image or _svg_image(category.emoji, category.accent)
+
+        db_category = Category(**payload, name=name, slug=slug)
 
         return self.repository.create_category(db_category)
 
@@ -99,6 +129,12 @@ class CategoryService:
 
         for key, value in updates.items():
             setattr(db_category, key, value)
+
+        if not db_category.image:
+            db_category.image = _svg_image(
+                db_category.emoji,
+                db_category.accent,
+            )
 
         return self.repository.update_category(db_category)
 

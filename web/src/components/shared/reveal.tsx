@@ -55,7 +55,7 @@ function Reveal({
       variants={variants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, margin: "-64px" }}
+      viewport={{ once, amount: 0.05 }}
     >
       {children}
     </Component>
@@ -68,6 +68,7 @@ interface StaggerProps {
   stagger?: number
   delay?: number
   as?: "div" | "ul" | "section"
+  animateOnMount?: boolean
 }
 
 function Stagger({
@@ -76,14 +77,16 @@ function Stagger({
   stagger = 0.08,
   delay = 0,
   as = "div",
+  animateOnMount = false,
 }: StaggerProps) {
   const Component = motion[as]
   return (
     <Component
       className={className}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-64px" }}
+      {...(animateOnMount
+        ? { animate: "visible" }
+        : { whileInView: "visible", viewport: { once: true, amount: 0.05 } })}
       variants={{
         hidden: {},
         visible: {

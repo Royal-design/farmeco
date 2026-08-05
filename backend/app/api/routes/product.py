@@ -22,7 +22,7 @@ router = APIRouter()
 # -------------------------
 # GET ALL PRODUCTS
 # -------------------------
-@router.get("/", response_model=SuccessResponse[list[ProductSummaryResponse]])
+@router.get("", response_model=SuccessResponse[list[ProductSummaryResponse]])
 def get_products(
     category: str | None = Query(None),
     search: str | None = Query(None),
@@ -33,6 +33,7 @@ def get_products(
     badge: ProductBadge | None = Query(None),
     in_stock: bool = Query(False),
     ids: list[UUID] | None = Query(None),
+    seller_id: UUID | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(12, ge=1, le=100),
     product_service: ProductService = Depends(get_product_service),
@@ -47,6 +48,7 @@ def get_products(
         badge=badge.value if badge else None,
         in_stock=in_stock,
         ids=ids,
+        seller_id=seller_id,
         page=page,
         page_size=page_size,
     )
@@ -111,7 +113,7 @@ def get_product_by_id(
 # CREATE PRODUCT (SELLER / ADMIN)
 # -------------------------
 @router.post(
-    "/",
+    "",
     response_model=SuccessResponse[ProductResponse],
     status_code=status.HTTP_201_CREATED,
 )

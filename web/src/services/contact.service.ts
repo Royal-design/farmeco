@@ -1,4 +1,4 @@
-import { mockRequest } from "@/services/request"
+import { api } from "@/lib/http"
 
 export interface ContactPayload {
   name: string
@@ -9,12 +9,15 @@ export interface ContactPayload {
 
 export const contactService = {
   async sendMessage(payload: ContactPayload): Promise<{ ticket: string }> {
-    await mockRequest(undefined, 700)
-    return { ticket: `TS-${Math.floor(10000 + Math.random() * 89999)}` }
+    const { data } = await api.post<{ ticket: string }>("/contact/messages", payload)
+    return { ticket: data.ticket }
   },
 
   async subscribeNewsletter(email: string): Promise<{ subscribed: boolean }> {
-    await mockRequest(undefined, 400)
-    return { subscribed: true }
+    const { data } = await api.post<{ subscribed: boolean }>(
+      "/contact/newsletter/subscribe",
+      { email }
+    )
+    return data
   },
 }

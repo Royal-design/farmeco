@@ -1,7 +1,8 @@
-import type { Product, ProductBadge } from "@/types/catalog"
 import type { Paginated, QueryParams } from "@/types/api"
-import { products } from "@/mock/products"
-import { mockRequest, paginateData } from "@/services/request"
+import { toPaginated } from "@/types/api"
+import type { Product, ProductBadge } from "@/types/catalog"
+import { api } from "@/lib/http"
+import { mapProduct, type RawProduct } from "@/services/mappers"
 
 export interface ProductQuery extends QueryParams {
   category?: string
@@ -13,127 +14,118 @@ export interface ProductQuery extends QueryParams {
   badge?: ProductBadge
   inStock?: boolean
   ids?: string[]
+  sellerId?: string
 }
 
 export type ProductFilters = Omit<ProductQuery, "page" | "pageSize">
 
-function applyFilters(items: Product[], params?: ProductFilters): Product[] {
-  if (!params) {
-    return items
-  }
+export type ProductStatus = "draft" | "published" | "archived"
 
-  let result = [...items]
+export interface ProductInput {
+  name: string
+  shortDescription: string
+  description: string
+  categoryId: string
+  price: number
+  compareAtPrice?: number
+  currency?: string
+  unit?: string
+  stock?: number
+  origin?: string
+  farm?: string
+  images?: string[]
+  specs?: Array<{ label: string; value: string }>
+  tags?: string[]
+  badges?: ProductBadge[]
+  status?: ProductStatus
+}
 
-  if (params.category && params.category !== "all") {
-    result = result.filter((product) => product.categoryId === params.category)
+function toPayload(input: Partial<ProductInput>): Record<string, unknown> {
+  return {
+    name: input.name,
+    short_description: input.shortDescription,
+    description: input.description,
+    category_id: input.categoryId,
+    price: input.price,
+    compare_at_price: input.compareAtPrice ?? null,
+    currency: input.currency,
+    unit: input.unit,
+    stock: input.stock,
+    origin: input.origin,
+    farm: input.farm,
+    images: input.images,
+    specs: input.specs,
+    tags: input.tags,
+    badges: input.badges,
+    status: input.status,
   }
-
-  if (params.ids?.length) {
-    result = result.filter((product) => params.ids?.includes(product.id))
-  }
-
-  if (params.search) {
-    const term = params.search.toLowerCase().trim()
-    result = result.filter(
-      (product) =>
-        product.name.toLowerCase().includes(term) ||
-        product.tags.some((tag) => tag.toLowerCase().includes(term)) ||
-        product.shortDescription.toLowerCase().includes(term)
-    )
-  }
-
-  if (typeof params.minPrice === "number") {
-    result = result.filter((product) => product.price >= (params.minPrice ?? 0))
-  }
-  if (typeof params.maxPrice === "number") {
-    result = result.filter((product) => product.price <= (params.maxPrice ?? Infinity))
-  }
-
-  if (typeof params.rating === "number" && params.rating > 0) {
-    result = result.filter((product) => product.rating >= (params.rating ?? 0))
-  }
-
-  if (params.badge) {
-    result = result.filter((product) => product.badges.includes(params.badge ?? "featured"))
-  }
-
-  if (params.inStock) {
-    result = result.filter((product) => product.stock > 0)
-  }
-
-  if (params.sort) {
-    switch (params.sort) {
-      case "newest":
-        result.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-        break
-      case "price-asc":
-        result.sort((a, b) => a.price - b.price)
-        break
-      case "price-desc":
-        result.sort((a, b) => b.price - a.price)
-        break
-      case "popular":
-        result.sort((a, b) => b.sold - a.sold)
-        break
-      case "rating":
-        result.sort((a, b) => b.rating - a.rating)
-        break
-    }
-  }
-
-  return result
 }
 
 export const productsService = {
   async getProducts(params?: ProductQuery): Promise<Paginated<Product>> {
-    const filtered = applyFilters(products, params)
-    return mockRequest(paginateData(filtered, params))
+    const { data, meta } = await api.get<RawProduct[]>("/products", {
+      category: params?.category,
+      search: params?.search,
+      sort: params?.sort,
+      min_price: params?.minPrice,
+      max_price: params?.maxPrice,
+      rating: params?.rating,
+      badge: params?.badge,
+      in_stock: params?.inStock || undefined,
+      ids: params?.ids?.length ? params.ids : undefined,
+      seller_id: params?.sellerId,
+      page: params?.page,
+      page_size: params?.pageSize,
+    })
+    return toPaginated(data.map(mapProduct), meta)
   },
 
   async getProduct(slug: string): Promise<Product | null> {
-    const product = products.find((p) => p.slug === slug) ?? null
-    return mockRequest(product, 220)
+    try {
+      const { data } = await api.get<RawProduct>(`/products/slug/${slug}`)
+      return mapProduct(data)
+    } catch {
+      return null
+    }
   },
 
   async getProductById(id: string): Promise<Product | null> {
-    const product = products.find((p) => p.id === id) ?? null
-    return mockRequest(product, 120)
+    try {
+      const { data } = await api.get<RawProduct>(`/products/${id}`)
+      return mapProduct(data)
+    } catch {
+      return null
+    }
   },
 
   async getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
-    const related = products
-      .filter(
-        (p) =>
-          p.categoryId === product.categoryId && p.id !== product.id
-      )
-      .slice(0, limit)
-    const popular = products
-      .filter((p) => p.id !== product.id)
-      .sort((a, b) => b.sold - a.sold)
-      .slice(0, limit)
-    const list = related.length >= limit ? related : [...related, ...popular].slice(0, limit)
-    return mockRequest(list, 220)
+    const { data } = await api.get<RawProduct[]>(`/products/related/${product.id}`, {
+      limit,
+    })
+    return data.map(mapProduct)
   },
 
-  async createProduct(data: Partial<Product>): Promise<Product> {
-    const product: Product = {
-      ...data,
-      id: `p-${Date.now()}`,
-      slug: data.slug ?? data.name?.toLowerCase().replace(/\s+/g, "-") ?? "",
-      reviews: [],
-      rating: 0,
-      reviewCount: 0,
-      sold: 0,
-      createdAt: new Date().toISOString(),
-    } as Product
-    return mockRequest(product, 400)
+  async createProduct(input: ProductInput): Promise<Product> {
+    const { data } = await api.post<RawProduct>("/products", toPayload(input))
+    return mapProduct(data)
   },
 
-  async updateProduct(id: string, data: Partial<Product>): Promise<Product | null> {
-    return mockRequest(null, 400)
+  async updateProduct(id: string, input: Partial<ProductInput>): Promise<Product> {
+    const { data } = await api.put<RawProduct>(`/products/${id}`, toPayload(input))
+    return mapProduct(data)
   },
 
   async deleteProduct(id: string): Promise<void> {
-    await mockRequest(undefined, 300)
+    await api.delete(`/products/${id}`)
+  },
+
+  async uploadImages(files: File[]): Promise<string[]> {
+    const formData = new FormData()
+    files.forEach((file) => formData.append("files", file))
+    const { data } = await api.upload<Array<{ url: string; public_id: string }>>(
+      "/uploads/images",
+      formData
+    )
+    return data.map((image) => image.url)
   },
 }

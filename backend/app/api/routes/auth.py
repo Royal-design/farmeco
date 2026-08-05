@@ -1,0 +1,142 @@
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, Request, status
+
+from app.api.dependencies.auth import get_bearer_token, get_current_user
+from app.api.dependencies.services import get_auth_service
+from app.models.user import User
+from app.schemas.auth import (
+    AuthResponse,
+    ChangePasswordRequest,
+    ForgotPasswordRequest,
+    GoogleAuthRequest,
+    LogoutRequest,
+    ResetPasswordRequest,
+)
+from app.schemas.response import MessageResponse, SuccessResponse
+from app.schemas.user import LoginRequest, RefreshTokenRequest, RegisterRequest
+from app.services.auth_service import AuthService
+
+router = APIRouter()
+
+
+# -------------------------
+# REGISTER
+# -------------------------
+@router.post(
+    "/register",
+    response_model=SuccessResponse[AuthResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+def register(
+    user: RegisterRequest,
+    background_tasks: BackgroundTasks,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    auth_data = auth_service.register(user, background_tasks)
+
+    return SuccessResponse(
+        message="User registered successfully",
+        data=AuthResponse.model_validate(auth_data),
+    )
+
+
+# -------------------------
+# LOGIN
+# -------------------------
+@router.post("/login", response_model=SuccessResponse[AuthResponse])
+def login(
+    data: LoginRequest,
+    request: Request,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    auth_data = auth_service.login(data, request)
+
+    return SuccessResponse(
+        message="Login successful",
+        data=AuthResponse.model_validate(auth_data),
+    )
+
+
+# -------------------------
+# GOOGLE LOGIN
+# -------------------------
+@router.post("/google", response_model=SuccessResponse[AuthResponse])
+def google_login(
+    request: GoogleAuthRequest,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    auth_data = auth_service.google_login(request)
+
+    return SuccessResponse(
+        message="Google login successful",
+        data=AuthResponse.model_validate(auth_data),
+    )
+
+
+# -------------------------
+# REFRESH TOKEN
+# -------------------------
+@router.post("/refresh", response_model=SuccessResponse[AuthResponse])
+def refresh(
+    data: RefreshTokenRequest,
+    request: Request,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    auth_data = auth_service.refresh(data, request)
+
+    return SuccessResponse(
+        message="Token refreshed successfully",
+        data=AuthResponse.model_validate(auth_data),
+    )
+
+
+# -------------------------
+# LOGOUT
+# -------------------------
+@router.post("/logout", response_model=MessageResponse)
+def logout(
+    logout_data: LogoutRequest | None = Body(default=None),
+    token: str = Depends(get_bearer_token),
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    return auth_service.logout(
+        access_token=token,
+        refresh_token=logout_data.refresh_token if logout_data else None,
+    )
+
+
+# -------------------------
+# FORGOT PASSWORD
+# -------------------------
+@router.post("/forgot-password", response_model=MessageResponse)
+def forgot_password(
+    data: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    return auth_service.forgot_password(data, background_tasks)
+
+
+# -------------------------
+# RESET PASSWORD
+# -------------------------
+@router.post("/reset-password", response_model=MessageResponse)
+def reset_password(
+    data: ResetPasswordRequest,
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    return auth_service.reset_password(data)
+
+
+# -------------------------
+# CHANGE PASSWORD
+# -------------------------
+@router.post("/change-password", response_model=MessageResponse)
+def change_password(
+    data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    return auth_service.change_password(
+        user_id=current_user.id,
+        request=data,
+    )

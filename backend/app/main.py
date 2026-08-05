@@ -1,0 +1,64 @@
+from typing import Any
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
+
+from app.api.router import includes_api_routes
+from app.core.app_exception_handler import app_exception_handler
+from app.core.config import settings
+from app.core.exceptions import AppException
+import app.models
+
+app = FastAPI()
+
+allowed_origins = {
+    settings.frontend_url.rstrip("/"),
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://farmeco.vercel.app",
+}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=sorted(allowed_origins),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+includes_api_routes(app)
+
+app.add_exception_handler(AppException, app_exception_handler)
+
+
+def _mark_upload_fields_as_binary(schema_part: Any) -> None:
+    if isinstance(schema_part, dict):
+        if schema_part.get("contentMediaType") == "application/octet-stream":
+            schema_part["format"] = "binary"
+
+        for value in schema_part.values():
+            _mark_upload_fields_as_binary(value)
+
+    if isinstance(schema_part, list):
+        for item in schema_part:
+            _mark_upload_fields_as_binary(item)
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        routes=app.routes,
+    )
+    _mark_upload_fields_as_binary(openapi_schema)
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi

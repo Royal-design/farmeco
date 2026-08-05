@@ -1,0 +1,84 @@
+import cloudinary
+from cloudinary import uploader
+from fastapi import UploadFile
+
+from app.core.config import settings
+from app.core.exceptions import AppException
+
+
+class CloudinaryService:
+    def __init__(self):
+        cloudinary.config(
+            cloud_name=settings.cloudinary_cloud_name,
+            api_key=settings.cloudinary_api_key,
+            api_secret=settings.cloudinary_api_secret,
+            secure=True,
+        )
+
+    def upload_image(self, image: UploadFile, folder: str = "farmeco") -> dict:
+        if not image.content_type.startswith("image/"):
+            raise AppException(
+                status_code=400,
+                error_code="INVALID_IMAGE",
+                message="Invalid file type. Only image files are allowed.",
+            )
+
+        result = uploader.upload(
+            image.file,
+            folder=folder,
+            public_id=image.filename.rsplit(".", 1)[0],
+            use_filename=True,
+            unique_filename=True,
+            overwrite=False,
+            resource_type="image",
+        )
+
+        return {
+            "url": result["secure_url"],
+            "public_id": result["public_id"],
+        }
+
+    def upload_image_from_url(self, url: str, folder: str = "farmeco") -> dict:
+        if not url or not url.strip():
+            raise AppException(
+                status_code=400,
+                error_code="INVALID_IMAGE_URL",
+                message="Image URL is required.",
+            )
+
+        if not url.startswith(("http://", "https://")):
+            raise AppException(
+                status_code=400,
+                error_code="INVALID_IMAGE_URL",
+                message="Invalid image URL. Please provide a valid http(s) URL.",
+            )
+
+        try:
+            result = uploader.upload(
+                url.strip(),
+                folder=folder,
+                use_filename=True,
+                unique_filename=True,
+                overwrite=False,
+                resource_type="image",
+            )
+        except Exception:
+            raise AppException(
+                status_code=400,
+                error_code="IMAGE_FETCH_FAILED",
+                message="Could not fetch the image from the provided URL.",
+            )
+
+        return {
+            "url": result["secure_url"],
+            "public_id": result["public_id"],
+        }
+
+    def delete_image(self, public_id: str) -> None:
+        if not public_id:
+            raise AppException(
+                status_code=400,
+                error_code="INVALID_PUBLIC_ID",
+                message="Public id is required.",
+            )
+        uploader.destroy(public_id, resource_type="image")

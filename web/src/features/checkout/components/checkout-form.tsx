@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -446,8 +447,16 @@ function CheckoutForm() {
             <ul className="flex max-h-64 flex-col gap-3 overflow-y-auto pr-1">
               {items.map((item) => (
                 <li key={item.productId} className="flex items-center gap-3">
-                  <span className="relative shrink-0">
-                    <img src={item.image} alt="" className="size-12 rounded-lg object-cover" />
+                  <span className="relative size-12 shrink-0">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt=""
+                        fill
+                        sizes="48px"
+                        className="rounded-lg object-cover"
+                      />
+                    ) : null}
                     <span className="absolute -top-1.5 -right-1.5 flex size-4.5 items-center justify-center rounded-full bg-foreground text-[0.6rem] font-semibold text-background">
                       {item.quantity}
                     </span>

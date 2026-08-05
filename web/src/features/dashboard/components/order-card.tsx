@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ChevronRightIcon } from "lucide-react"
 
 import type { Order } from "@/types/order"
@@ -37,7 +38,15 @@ function OrderCard({ order, href }: OrderCardProps) {
               key={item.productId}
               className="flex size-11 items-center justify-center overflow-hidden rounded-full border-2 border-card bg-muted text-lg"
             >
-              <img src={item.image} alt="" className="size-full object-cover" />
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="size-full object-cover"
+                />
+              ) : null}
             </span>
           ))}
         </div>

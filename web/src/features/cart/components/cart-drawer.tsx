@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Trash2Icon, ArrowRightIcon, ShoppingBagIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -100,11 +101,15 @@ function CartDrawer() {
                     onClick={closeCart}
                     className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted"
                   >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="size-full object-cover"
-                    />
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={64}
+                        height={64}
+                        className="size-full object-cover"
+                      />
+                    ) : null}
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-start justify-between gap-2">

@@ -19,6 +19,7 @@ allowed_origins = {
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://farmeco.vercel.app",
+    "https://livestock-hub.onrender.com"
 }
 
 app.add_middleware(

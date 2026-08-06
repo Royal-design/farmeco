@@ -1,17 +1,13 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios"
 
-import type { ApiEnvelope, ApiError, ApiResult } from "@/types/api"
 import {
   clearStoredSession,
   getStoredTokens,
   updateStoredTokens,
 } from "@/lib/session"
+import type { ApiEnvelope, ApiError, ApiResult } from "@/types/api"
 
-const isServer = typeof window === "undefined"
-const configuredBase = process.env.NEXT_PUBLIC_API_URL
-
-export const API_BASE =
-  configuredBase ?? (isServer ? "http://127.0.0.1:8000/api/v1" : "/api/v1")
+const API_BASE = process.env.NEXT_PUBLIC_API_URL
 
 const http = axios.create({
   baseURL: API_BASE,

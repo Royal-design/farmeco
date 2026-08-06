@@ -1,15 +1,14 @@
 "use client"
 
-import * as React from "react"
 import { useRouter } from "next/navigation"
+import * as React from "react"
 import { toast } from "sonner"
 
-import { useAuthStore } from "@/store/auth-store"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useAuthStore } from "@/store/auth-store"
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-
 interface GoogleTokenResponse {
   access_token?: string
   error?: string

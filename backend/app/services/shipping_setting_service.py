@@ -58,8 +58,8 @@ class ShippingSettingService:
                 resource_type="shipping_settings",
                 resource_id=updated.id,
                 summary=(
-                    f"Updated delivery fees: free over ₦{float(free_shipping_threshold):,.0f}, "
-                    f"flat rate ₦{float(flat_rate):,.0f}"
+                    f"Updated delivery fees: free shipping over {float(free_shipping_threshold):,.0f} "
+                    f"(NGN), flat rate {float(flat_rate):,.0f} (NGN)"
                 ),
                 before=previous,
                 after={

@@ -37,12 +37,16 @@ export function formatDate(
   locale = "en-US",
   options?: Intl.DateTimeFormatOptions
 ) {
+  const parsed = typeof date === "string" ? new Date(date) : date
+  if (Number.isNaN(parsed.getTime())) {
+    return String(date)
+  }
   return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
     ...options,
-  }).format(new Date(date))
+  }).format(parsed)
 }
 
 export function timeAgo(date: string | Date) {

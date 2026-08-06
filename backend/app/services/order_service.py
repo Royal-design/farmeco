@@ -14,6 +14,7 @@ from app.schemas.user import PaginationMeta
 from app.services.audit_service import AuditService
 from app.services.coupon_service import CouponService
 from app.services.notification_service import NotificationService
+from app.services.shipping_setting_service import ShippingSettingService
 
 FREE_SHIPPING_THRESHOLD = 200000
 SHIPPING_FLAT_RATE = 15000
@@ -27,12 +28,23 @@ class OrderService:
         coupon_service: CouponService,
         audit_service: AuditService | None = None,
         notification_service: NotificationService | None = None,
+        shipping_setting_service: ShippingSettingService | None = None,
     ):
         self.order_repository = order_repository
         self.product_repository = product_repository
         self.coupon_service = coupon_service
         self.audit_service = audit_service
         self.notification_service = notification_service
+        self.shipping_setting_service = shipping_setting_service
+
+    def _shipping_config(self) -> tuple[float, float]:
+        if self.shipping_setting_service:
+            setting = self.shipping_setting_service.get()
+            return (
+                float(setting.free_shipping_threshold),
+                float(setting.flat_rate),
+            )
+        return float(FREE_SHIPPING_THRESHOLD), float(SHIPPING_FLAT_RATE)
 
     def _status_event(self, status: OrderStatus) -> dict:
         return {
@@ -222,7 +234,8 @@ class OrderService:
                 else min(coupon.value, subtotal)
             )
 
-        shipping = 0.0 if subtotal >= FREE_SHIPPING_THRESHOLD else SHIPPING_FLAT_RATE
+        free_threshold, flat_rate = self._shipping_config()
+        shipping = 0.0 if subtotal >= free_threshold else flat_rate
         tax = 0.0
         total = max(0.0, subtotal - discount) + shipping
 

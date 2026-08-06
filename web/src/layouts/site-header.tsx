@@ -20,6 +20,8 @@ import { toast } from "sonner"
 
 import { mainNav } from "@/config/site"
 import { cn } from "@/lib/utils"
+import { formatPrice } from "@/utils/format"
+import { useShippingSettings } from "@/hooks/use-shipping-settings"
 import { useUIStore } from "@/store/ui-store"
 import { useAuthStore } from "@/store/auth-store"
 import { useCartStore, selectCartCount } from "@/store/cart-store"
@@ -40,10 +42,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 function AnnouncementBar() {
+  const shipping = useShippingSettings()
   return (
     <div className="relative overflow-hidden bg-gradient-to-r from-brand via-moss to-brand px-4 py-2 text-center">
       <p className="text-xs font-medium tracking-wide text-brand-foreground">
-        Free doorstep delivery on orders over ₦200,000 ·{" "}
+        Free doorstep delivery on orders over{" "}
+        {formatPrice(shipping.freeShippingThreshold)} ·{" "}
         <span className="underline underline-offset-2">Health-checked livestock</span>{" "}
         from verified farms
       </p>
@@ -191,7 +195,12 @@ function SiteHeader() {
             >
               <MenuIcon className="size-5" />
             </Button>
-            <Logo />
+            <div className="sm:hidden">
+              <Logo showWordmark={false} />
+            </div>
+            <div className="hidden sm:block">
+              <Logo />
+            </div>
           </div>
 
           <HeaderNav />
@@ -205,7 +214,9 @@ function SiteHeader() {
             >
               <SearchIcon className="size-4" />
             </Button>
-            <ThemeToggle />
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
 
             <NotificationsMenu />
 

@@ -8,7 +8,7 @@ import { toast } from "sonner"
 
 import { useCartStore, selectCartSubtotal, selectCartCount } from "@/store/cart-store"
 import { formatPrice } from "@/utils/format"
-import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "@/constants/order"
+import { useShippingSettings } from "@/hooks/use-shipping-settings"
 import {
   Drawer,
   DrawerContent,
@@ -25,8 +25,9 @@ import { Progress } from "@/components/ui/progress"
 
 function FreeShippingProgress() {
   const subtotal = useCartStore(selectCartSubtotal)
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
-  const progress = Math.min(1, subtotal / FREE_SHIPPING_THRESHOLD)
+  const shipping = useShippingSettings()
+  const remaining = Math.max(0, shipping.freeShippingThreshold - subtotal)
+  const progress = Math.min(1, subtotal / shipping.freeShippingThreshold)
 
   return (
     <div className="space-y-1.5 rounded-xl bg-muted/70 p-3 text-xs">

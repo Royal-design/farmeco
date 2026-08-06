@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { CheckoutGuard } from "@/features/checkout/components/checkout-guard"
 import { CheckoutForm } from "@/features/checkout/components/checkout-form"
 
 export const metadata: Metadata = {
@@ -10,5 +11,9 @@ export const metadata: Metadata = {
 }
 
 export default function CheckoutPage() {
-  return <CheckoutForm />
+  return (
+    <CheckoutGuard>
+      <CheckoutForm />
+    </CheckoutGuard>
+  )
 }

@@ -4,6 +4,7 @@ import {
   MessageCircleIcon,
   PackageIcon,
   ScrollTextIcon,
+  SettingsIcon,
   ShoppingCartIcon,
   TagsIcon,
   TicketIcon,
@@ -28,6 +29,7 @@ export const adminNavItems: DashboardNavItem[] = [
   { href: "/admin/coupons", label: "Coupons", icon: TicketIcon },
   { href: "/admin/blog", label: "Blog", icon: FileTextIcon },
   { href: "/admin/audit-log", label: "Audit log", icon: ScrollTextIcon },
+  { href: "/admin/settings", label: "Settings", icon: SettingsIcon },
 ]
 
 export const sellerNavItems: DashboardNavItem[] = [

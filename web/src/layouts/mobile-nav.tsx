@@ -3,11 +3,13 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRightIcon, ShieldIcon, StoreIcon } from "lucide-react"
+import { useTheme } from "next-themes"
+import { ChevronRightIcon, MoonIcon, ShieldIcon, StoreIcon, SunIcon } from "lucide-react"
 
 import { mainNav } from "@/config/site"
 import { useUIStore } from "@/store/ui-store"
 import { useAuthStore } from "@/store/auth-store"
+import { useMounted } from "@/hooks/use-mounted"
 import { cn } from "@/lib/utils"
 import {
   Drawer,
@@ -20,6 +22,32 @@ import {
 import { Logo } from "@/components/shared/logo"
 import { ButtonLink } from "@/components/ui/button"
 import { Avatar } from "@/components/ui/avatar"
+
+function ThemeRow() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const mounted = useMounted()
+  const isDark = resolvedTheme === "dark"
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+    >
+      <span className="flex items-center gap-3">
+        {isDark ? (
+          <SunIcon className="size-4.5 text-brand" />
+        ) : (
+          <MoonIcon className="size-4.5 text-brand" />
+        )}
+        Theme
+      </span>
+      <span className="text-sm text-muted-foreground capitalize">
+        {mounted ? (isDark ? "Dark" : "Light") : "Light"}
+      </span>
+    </button>
+  )
+}
 
 function MobileNav() {
   const open = useUIStore((state) => state.mobileNavOpen)
@@ -34,7 +62,10 @@ function MobileNav() {
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Logo showWordmark={false} />
-            <span>Menu</span>
+            <span className="font-heading text-lg font-semibold tracking-tight">
+              Farmeco
+            </span>
+            <span className="text-muted-foreground">Menu</span>
           </DrawerTitle>
           <DrawerClose />
         </DrawerHeader>
@@ -112,6 +143,7 @@ function MobileNav() {
           </nav>
 
           <div className="mt-6 flex flex-col gap-2 border-t pt-4">
+            <ThemeRow />
             {status !== "authenticated" ? (
               <>
                 <ButtonLink href="/login" onClick={close}>

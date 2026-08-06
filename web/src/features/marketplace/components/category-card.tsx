@@ -1,13 +1,12 @@
 "use client"
 
-import * as React from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { ArrowUpRightIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import { ArrowUpRightIcon } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
-import type { Category } from "@/types/catalog"
 import { cn } from "@/lib/utils"
+import type { Category } from "@/types/catalog"
 import { formatNumber } from "@/utils/format"
 
 interface CategoryCardProps {
@@ -41,7 +40,7 @@ function CategoryCard({ category, className, compact = false }: CategoryCardProp
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
           />
         ) : null}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/80 to-transparent" />
 
         <motion.div
           variants={{

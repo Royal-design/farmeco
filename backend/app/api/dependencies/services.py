@@ -13,6 +13,7 @@ from app.repositories.payment_method_repository import PaymentMethodRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.refresh_token_repository import RefreshTokenRepository
 from app.repositories.review_repository import ReviewRepository
+from app.repositories.shipping_setting_repository import ShippingSettingRepository
 from app.repositories.user_repository import UserRepository
 from app.services.audit_service import AuditService
 from app.services.auth_service import AuthService
@@ -29,6 +30,7 @@ from app.services.payment_service import PaymentService
 from app.services.product_service import ProductService
 from app.services.refresh_token_service import RefreshTokenService
 from app.services.review_service import ReviewService
+from app.services.shipping_setting_service import ShippingSettingService
 from app.services.upload_service import UploadService
 from app.services.user_service import UserService
 
@@ -114,6 +116,14 @@ def get_order_service(db: Session = Depends(get_db)) -> OrderService:
         get_coupon_service(db),
         get_audit_service(db),
         get_notification_service(db),
+        get_shipping_setting_service(db),
+    )
+
+
+def get_shipping_setting_service(db: Session = Depends(get_db)) -> ShippingSettingService:
+    return ShippingSettingService(
+        ShippingSettingRepository(db),
+        get_audit_service(db),
     )
 
 

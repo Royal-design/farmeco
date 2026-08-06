@@ -24,7 +24,7 @@ import { paymentsService } from "@/services/payments.service"
 import { couponsService } from "@/services/coupons.service"
 import type { Coupon } from "@/types/order"
 import { formatPrice } from "@/utils/format"
-import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT_RATE } from "@/constants/order"
+import { useShippingSettings } from "@/hooks/use-shipping-settings"
 import { cn } from "@/lib/utils"
 import { Button, ButtonLink } from "@/components/ui/button"
 import {
@@ -51,6 +51,7 @@ function CheckoutForm() {
   const subtotal = useCartStore(selectCartSubtotal)
   const count = useCartStore(selectCartCount)
   const user = useAuthStore((state) => state.user)
+  const shipping = useShippingSettings()
 
   const [appliedCoupon, setAppliedCoupon] = React.useState<Coupon | null>(null)
   const [couponCode, setCouponCode] = React.useState("")
@@ -92,7 +93,8 @@ function CheckoutForm() {
       ? subtotal * (appliedCoupon.value / 100)
       : appliedCoupon.value
     : 0
-  const delivery = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT_RATE
+  const delivery =
+    subtotal >= shipping.freeShippingThreshold ? 0 : shipping.flatRate
   const total = Math.max(0, subtotal - discount) + delivery
 
   const handleApplyCoupon = async () => {
@@ -409,7 +411,7 @@ function CheckoutForm() {
                         className="rounded-lg object-cover"
                       />
                     ) : null}
-                    <span className="absolute -top-1.5 -right-1.5 flex size-4.5 items-center justify-center rounded-full bg-foreground text-[0.6rem] font-semibold text-background">
+                    <span className="absolute top-0.5 right-0.5 flex size-4.5 items-center justify-center rounded-full bg-foreground text-[0.6rem] font-semibold text-background ring-2 ring-card">
                       {item.quantity}
                     </span>
                   </span>

@@ -126,10 +126,11 @@ function DashboardShell({ kind = "account", title, children }: DashboardShellPro
           </Badge>
         </div>
       )}
-      <DashboardNav items={navItems} />
+      <DashboardNav items={navItems} onNavigate={closeSidebar} />
       <div className="flex flex-col gap-1 border-t pt-4">
         <Link
           href="/shop"
+          onClick={closeSidebar}
           className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <ArrowLeftIcon className="size-4.5" />

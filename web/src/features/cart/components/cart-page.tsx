@@ -18,7 +18,7 @@ import { useCartStore, selectCartSubtotal, selectCartCount } from "@/store/cart-
 import { couponsService } from "@/services/coupons.service"
 import type { Coupon } from "@/types/order"
 import { formatPrice } from "@/utils/format"
-import { FREE_SHIPPING_THRESHOLD } from "@/constants/order"
+import { useShippingSettings } from "@/hooks/use-shipping-settings"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button, ButtonLink } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -31,13 +31,14 @@ function CartPage() {
   const removeItem = useCartStore((state) => state.removeItem)
   const subtotal = useCartStore(selectCartSubtotal)
   const count = useCartStore(selectCartCount)
+  const shipping = useShippingSettings()
 
   const [couponCode, setCouponCode] = React.useState("")
   const [appliedCoupon, setAppliedCoupon] = React.useState<Coupon | null>(null)
   const [applying, setApplying] = React.useState(false)
 
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
-  const progress = Math.min(1, subtotal / FREE_SHIPPING_THRESHOLD)
+  const remaining = Math.max(0, shipping.freeShippingThreshold - subtotal)
+  const progress = Math.min(1, subtotal / shipping.freeShippingThreshold)
 
   const discount = appliedCoupon
     ? appliedCoupon.type === "percent"

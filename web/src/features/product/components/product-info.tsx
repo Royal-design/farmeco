@@ -1,28 +1,27 @@
 "use client"
 
-import * as React from "react"
 import {
-  HeartIcon,
-  ShoppingBagIcon,
-  ZapIcon,
-  MapPinIcon,
-  Building2Icon,
-  TruckIcon,
-  ShieldCheckIcon,
-  RefreshCcwIcon,
   BadgeCheckIcon,
+  Building2Icon,
+  HeartIcon,
+  MapPinIcon,
+  RefreshCcwIcon,
+  ShieldCheckIcon,
+  ShoppingBagIcon,
+  TruckIcon
 } from "lucide-react"
+import * as React from "react"
 import { toast } from "sonner"
 
-import type { Product } from "@/types/catalog"
-import { formatPrice, formatNumber } from "@/utils/format"
-import { useCartStore } from "@/store/cart-store"
-import { useWishlistStore } from "@/store/wishlist-store"
-import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Rating } from "@/components/ui/rating"
 import { badgeMeta } from "@/constants/order"
 import { QuantityStepper } from "@/features/cart/components/quantity-stepper"
+import { cn } from "@/lib/utils"
+import { useCartStore } from "@/store/cart-store"
+import { useWishlistStore } from "@/store/wishlist-store"
+import type { Product } from "@/types/catalog"
+import { formatNumber, formatPrice } from "@/utils/format"
 
 interface ProductInfoProps {
   product: Product
@@ -64,21 +63,7 @@ function ProductInfo({ product }: ProductInfoProps) {
     openCart()
   }
 
-  const handleBuyNow = () => {
-    if (!inStock) return
-    addItem({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      image: product.images[0],
-      price: product.price,
-      compareAtPrice: product.compareAtPrice,
-      unit: product.unit,
-      quantity,
-      stock: product.stock,
-    })
-    toast.success("Heading to checkout")
-  }
+  
 
   return (
     <div className="flex flex-col gap-6">
@@ -157,15 +142,7 @@ function ProductInfo({ product }: ProductInfoProps) {
             <HeartIcon className={cn("size-4", isWishlisted && "fill-current")} />
           </button>
         </div>
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          disabled={!inStock}
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-brand/25 bg-brand/5 px-5 text-sm font-medium text-brand transition-colors hover:bg-brand/10 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <ZapIcon className="size-4" />
-          Buy it now
-        </button>
+      
       </div>
 
       <div className="grid grid-cols-2 gap-3">

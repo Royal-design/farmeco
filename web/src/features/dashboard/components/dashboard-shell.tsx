@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import {
   ArrowLeftIcon,
   HeartIcon,
   LayoutDashboardIcon,
   LogOutIcon,
   MenuIcon,
+  MessageCircleIcon,
   PackageIcon,
   SettingsIcon,
   UserIcon,
@@ -22,6 +23,7 @@ import { adminNavItems, sellerNavItems } from "@/config/dashboard"
 const accountNavItems: DashboardNavItem[] = [
   { href: "/account", label: "Overview", icon: LayoutDashboardIcon, exact: true },
   { href: "/account/orders", label: "Orders", icon: PackageIcon },
+  { href: "/account/messages", label: "Messages", icon: MessageCircleIcon },
   { href: "/account/profile", label: "Profile", icon: UserIcon },
   { href: "/account/settings", label: "Settings", icon: SettingsIcon },
   { href: "/wishlist", label: "Wishlist", icon: HeartIcon },
@@ -93,7 +95,6 @@ interface DashboardShellProps {
 }
 
 function DashboardShell({ kind = "account", title, children }: DashboardShellProps) {
-  const router = useRouter()
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
   const navItems: DashboardNavItem[] =
@@ -108,7 +109,7 @@ function DashboardShell({ kind = "account", title, children }: DashboardShellPro
   const handleLogout = async () => {
     await logout()
     toast.success("Signed out")
-    router.push("/")
+    window.location.href = "/"
   }
 
   const sidebar = (

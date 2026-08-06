@@ -9,6 +9,7 @@ import { ChevronLeftIcon, MapPinIcon, TruckIcon, CreditCardIcon } from "lucide-r
 import { ordersService } from "@/services/orders.service"
 import { formatDate, formatPrice } from "@/utils/format"
 import { OrderStatusBadge } from "@/features/dashboard/components/order-status-badge"
+import { OrderProgress } from "@/features/dashboard/components/order-progress"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface OrderDetailProps {
@@ -70,6 +71,8 @@ function OrderDetail({ orderId }: OrderDetailProps) {
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
+
+      <OrderProgress order={order} />
 
       <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
         <div className="flex flex-col gap-4">

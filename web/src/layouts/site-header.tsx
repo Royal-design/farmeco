@@ -27,6 +27,7 @@ import { useWishlistStore } from "@/store/wishlist-store"
 import { useScrollPosition } from "@/hooks/use-scroll-position"
 import { Logo } from "@/components/shared/logo"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
+import { NotificationsMenu } from "@/features/notifications/components/notifications-menu"
 import { Button, ButtonLink } from "@/components/ui/button"
 import { Avatar } from "@/components/ui/avatar"
 import {
@@ -87,7 +88,7 @@ function AccountMenu() {
   const handleLogout = async () => {
     await logout()
     toast.success("Signed out successfully")
-    router.push("/")
+    window.location.href = "/"
   }
 
   if (status === "authenticated" && user) {
@@ -205,6 +206,8 @@ function SiteHeader() {
               <SearchIcon className="size-4" />
             </Button>
             <ThemeToggle />
+
+            <NotificationsMenu />
 
             <ButtonLink
               href="/wishlist"

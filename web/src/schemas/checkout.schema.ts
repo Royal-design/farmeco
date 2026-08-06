@@ -19,7 +19,7 @@ export const shippingSchema = z.object({
 export type ShippingFormValues = z.infer<typeof shippingSchema>
 
 export const paymentSchema = z.object({
-  method: z.enum(["card", "cod", "bank_transfer"], {
+  method: z.enum(["card", "cod"], {
     message: "Select a payment method",
   }),
   cardNumber: z

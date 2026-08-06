@@ -48,11 +48,8 @@ export const metadata: Metadata = {
   publisher: siteConfig.name,
   formatDetection: { email: false, address: false, telephone: false },
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
-    shortcut: "/favicon.ico",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
   },
   openGraph: {
     type: "website",

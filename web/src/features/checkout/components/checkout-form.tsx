@@ -9,7 +9,6 @@ import {
   CheckCircle2Icon,
   CreditCardIcon,
   BanknoteIcon,
-  LandmarkIcon,
   LockIcon,
   ShieldCheckIcon,
   TruckIcon,
@@ -21,6 +20,7 @@ import { checkoutSchema, type CheckoutFormValues } from "@/schemas/checkout.sche
 import { useCartStore, selectCartSubtotal, selectCartCount } from "@/store/cart-store"
 import { useAuthStore } from "@/store/auth-store"
 import { ordersService } from "@/services/orders.service"
+import { paymentsService } from "@/services/payments.service"
 import { couponsService } from "@/services/coupons.service"
 import type { Coupon } from "@/types/order"
 import { formatPrice } from "@/utils/format"
@@ -37,14 +37,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
-import { Progress } from "@/components/ui/progress"
 
 const paymentMethods = [
-  { value: "card", label: "Card", description: "Debit or credit card", icon: CreditCardIcon },
+  { value: "card", label: "Card (Paystack)", description: "Secure card payment via Paystack", icon: CreditCardIcon },
   { value: "cod", label: "Cash on delivery", description: "Pay when your order arrives", icon: BanknoteIcon },
-  { value: "bank_transfer", label: "Bank transfer", description: "Instant or wire transfer", icon: LandmarkIcon },
 ] as const
 
 function CheckoutForm() {
@@ -126,6 +123,13 @@ function CheckoutForm() {
         shippingAddress: values.shipping,
         notes: values.notes,
       })
+
+      if (values.payment.method === "card") {
+        const payment = await paymentsService.initialize(order.id)
+        window.location.href = payment.authorizationUrl
+        return
+      }
+
       clearCart()
       setPlacedOrder(order.number)
     } catch {
@@ -330,68 +334,16 @@ function CheckoutForm() {
             <FieldError errors={[form.formState.errors.payment?.method]} />
 
             {paymentMethod === "card" && (
-              <div className="flex flex-col gap-4 rounded-2xl border border-border bg-muted/40 p-5">
-                <Controller
-                  name="payment.cardNumber"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Field>
-                      <FieldLabel htmlFor="payment-card-number">Card number</FieldLabel>
-                      <Input
-                        id="payment-card-number"
-                        inputMode="numeric"
-                        placeholder="4242 4242 4242 4242"
-                        className="font-mono"
-                        aria-invalid={!!form.formState.errors.payment?.cardNumber}
-                        {...field}
-                        onChange={(event) => {
-                          const digits = event.target.value.replace(/\D/g, "").slice(0, 16)
-                          field.onChange(digits.replace(/(\d{4})(?=\d)/g, "$1 "))
-                        }}
-                      />
-                      <FieldError errors={[form.formState.errors.payment?.cardNumber]} />
-                    </Field>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <Controller
-                    name="payment.cardExpiry"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Field>
-                        <FieldLabel htmlFor="payment-card-expiry">Expiry</FieldLabel>
-                        <Input
-                          id="payment-card-expiry"
-                          placeholder="MM/YY"
-                          className="font-mono"
-                          {...field}
-                          onChange={(event) => {
-                            const raw = event.target.value.replace(/\D/g, "").slice(0, 4)
-                            const formatted = raw.length > 2 ? `${raw.slice(0, 2)}/${raw.slice(2)}` : raw
-                            field.onChange(formatted)
-                          }}
-                        />
-                      </Field>
-                    )}
-                  />
-                  <Controller
-                    name="payment.cardCvc"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Field>
-                        <FieldLabel htmlFor="payment-card-cvc">CVC</FieldLabel>
-                        <Input
-                          id="payment-card-cvc"
-                          inputMode="numeric"
-                          placeholder="123"
-                          maxLength={4}
-                          className="font-mono"
-                          {...field}
-                          onChange={(event) => field.onChange(event.target.value.replace(/\D/g, ""))}
-                        />
-                      </Field>
-                    )}
-                  />
+              <div className="flex items-start gap-3 rounded-2xl border border-border bg-muted/40 p-5 text-sm text-muted-foreground">
+                <ShieldCheckIcon className="mt-0.5 size-5 shrink-0 text-brand" />
+                <div>
+                  <p className="font-medium text-foreground">
+                    Secured by Paystack
+                  </p>
+                  <p className="mt-1">
+                    After placing your order you&apos;ll be redirected to
+                    Paystack&apos;s secure checkout to complete your card payment.
+                  </p>
                 </div>
               </div>
             )}

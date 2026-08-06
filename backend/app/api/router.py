@@ -1,12 +1,15 @@
 from fastapi import APIRouter
 
 from app.api.routes.account import router as account_router
+from app.api.routes.audit import router as audit_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.blog import router as blog_router
 from app.api.routes.category import router as category_router
 from app.api.routes.contact import router as contact_router
 from app.api.routes.coupon import router as coupon_router
 from app.api.routes.order import router as order_router
+from app.api.routes.notification import router as notification_router
+from app.api.routes.payment import router as payment_router
 from app.api.routes.product import router as product_router
 from app.api.routes.review import router as review_router
 from app.api.routes.upload import router as upload_router
@@ -27,6 +30,9 @@ def includes_api_routes(api: APIRouter):
     api.include_router(upload_router, prefix="/api/v1/uploads", tags=["Uploads"])
     api.include_router(blog_router, prefix="/api/v1/blog", tags=["Blog"])
     api.include_router(contact_router, prefix="/api/v1/contact", tags=["Contact"])
+    api.include_router(audit_router, prefix="/api/v1/audit-logs", tags=["Audit"])
+    api.include_router(notification_router, prefix="/api/v1/notifications", tags=["Notifications"])
+    api.include_router(payment_router, prefix="/api/v1/payments", tags=["Payments"])
 
 
 includes_api_routes(api_router)

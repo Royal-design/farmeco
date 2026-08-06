@@ -37,3 +37,29 @@ class EmailService:
                 </p>
             """,
         })
+
+    def send_message_reply_email(
+        self,
+        email: str,
+        name: str,
+        ticket: str,
+        subject: str,
+        reply: str,
+    ) -> None:
+        reply_html = reply.replace("\n", "<br>")
+        resend.Emails.send({
+            "from": settings.mail_from,
+            "to": [email],
+            "subject": f"Re: {subject}",
+            "html": f"""
+                <h2>We've responded to your message</h2>
+                <p>Hi {name},</p>
+                <p>Regarding your message <strong>{ticket}</strong> — "{subject}":</p>
+                <div style="margin:16px 0;padding:16px;border-left:3px solid #2f5d3f;background:#f5f7f5;border-radius:6px;font-size:14px;line-height:1.6;">
+                    {reply_html}
+                </div>
+                <p style="font-size:13px;color:#666;">
+                    You can also view this response anytime in your Farmeco account dashboard under "Messages".
+                </p>
+            """,
+        })

@@ -115,10 +115,14 @@ export interface RawOrder {
   discount: number | string
   total: number | string
   payment_method: Order["paymentMethod"]
+  payment_status: Order["paymentStatus"] | null
+  payment_reference: string | null
+  paid_at: string | null
   coupon_code: string | null
   shipping_address: RawShippingAddress
   notes: string | null
   eta: string | null
+  status_history: Array<{ status: Order["status"]; at: string }> | null
   delivered_at: string | null
   created_at: string
   updated_at: string
@@ -294,10 +298,16 @@ export function mapOrder(raw: RawOrder): Order {
     discount: Number(raw.discount),
     total: Number(raw.total),
     paymentMethod: raw.payment_method,
+    paymentStatus: raw.payment_status ?? undefined,
+    paymentReference: raw.payment_reference ?? undefined,
+    paidAt: raw.paid_at ?? undefined,
     couponCode: raw.coupon_code ?? undefined,
     shippingAddress: mapShippingAddress(raw.shipping_address),
     notes: raw.notes ?? undefined,
     eta: raw.eta ?? undefined,
+    statusHistory: raw.status_history?.length
+      ? raw.status_history
+      : [{ status: raw.status, at: raw.created_at }],
     deliveredAt: raw.delivered_at ?? undefined,
     createdAt: raw.created_at,
   }

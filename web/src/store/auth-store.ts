@@ -17,6 +17,7 @@ interface AuthState {
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>
   googleLogin: (accessToken: string) => Promise<void>
   logout: () => Promise<void>
+  expireSession: () => void
   hydrate: () => Promise<void>
   setUser: (user: User) => void
 }
@@ -81,6 +82,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       // still clear locally
     }
+    clearStoredSession()
+    set({ user: null, accessToken: null, refreshToken: null, status: "unauthenticated" })
+  },
+
+  expireSession: () => {
     clearStoredSession()
     set({ user: null, accessToken: null, refreshToken: null, status: "unauthenticated" })
   },

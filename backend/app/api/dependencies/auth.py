@@ -11,6 +11,7 @@ from app.models.user import User
 from app.services.user_service import UserService
 
 bearer_scheme = HTTPBearer()
+optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_bearer_token(
@@ -63,3 +64,36 @@ def get_current_admin_user(
             error_code="FORBIDDEN",
         )
     return current_user
+
+
+def get_current_staff_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if current_user.role not in (UserRole.ADMIN, UserRole.SELLER):
+        raise AppException(
+            message="Admin or seller privileges required",
+            status_code=403,
+            error_code="FORBIDDEN",
+        )
+    return current_user
+
+
+def get_optional_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Security(optional_bearer_scheme),
+    user_service: UserService = Depends(get_user_service),
+) -> User | None:
+    if credentials is None:
+        return None
+
+    try:
+        payload = decode_access_token(credentials.credentials)
+        user_id = UUID(payload.get("sub"))
+    except (AttributeError, TypeError, ValueError):
+        return None
+
+    user = user_service.get_user_by_id(user_id)
+
+    if not user or not user.is_active:
+        return None
+
+    return user

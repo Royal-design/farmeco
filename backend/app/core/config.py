@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     google_client_id: str
     google_client_secret: str
 
+    # Paystack
+    paystack_secret_key: str = ""
+    paystack_public_key: str = ""
+
     # Email
     mail_username: str
     mail_password: str
@@ -40,6 +44,9 @@ class Settings(BaseSettings):
     mail_from: str
     # Frontend
     frontend_url: str
+    
+    # Paystack
+    paystack_secret_key: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

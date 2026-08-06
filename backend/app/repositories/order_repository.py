@@ -20,6 +20,9 @@ class OrderRepository:
     def get_order_by_number(self, number: str) -> Order | None:
         return self._query().filter(Order.number == number).first()
 
+    def get_order_by_reference(self, reference: str) -> Order | None:
+        return self._query().filter(Order.payment_reference == reference).first()
+
     def get_orders_by_user(
         self,
         user_id: UUID,

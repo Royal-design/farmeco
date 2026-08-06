@@ -69,7 +69,10 @@ export const ordersService = {
 
   async createOrder(input: CreateOrderInput): Promise<Order> {
     const { data } = await api.post<RawOrder>("/orders", {
-      items: input.items,
+      items: input.items.map((item) => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+      })),
       payment_method: input.paymentMethod,
       coupon_code: input.couponCode ?? null,
       shipping_address: {

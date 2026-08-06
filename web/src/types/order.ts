@@ -7,6 +7,7 @@ export type OrderStatus =
   | "cancelled"
 
 export type PaymentMethod = "card" | "cod" | "bank_transfer"
+export type PaymentStatus = "unpaid" | "paid" | "failed" | "refunded"
 
 export interface OrderItem {
   productId: string
@@ -28,6 +29,11 @@ export interface ShippingAddress {
   country: string
 }
 
+export interface OrderStatusEvent {
+  status: OrderStatus
+  at: string
+}
+
 export interface Order {
   id: string
   number: string
@@ -39,9 +45,13 @@ export interface Order {
   discount: number
   total: number
   paymentMethod: PaymentMethod
+  paymentStatus?: PaymentStatus
+  paymentReference?: string
+  paidAt?: string
   couponCode?: string
   shippingAddress: ShippingAddress
   notes?: string
+  statusHistory?: OrderStatusEvent[]
   createdAt: string
   deliveredAt?: string
   eta?: string

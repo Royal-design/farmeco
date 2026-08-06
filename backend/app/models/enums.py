@@ -43,9 +43,29 @@ class PaymentMethod(StrEnum):
     BANK_TRANSFER = "bank_transfer"
 
 
+class PaymentStatus(StrEnum):
+    UNPAID = "unpaid"
+    PAID = "paid"
+    FAILED = "failed"
+    REFUNDED = "refunded"
+
+
+class NotificationType(StrEnum):
+    MESSAGE = "message"
+    ORDER = "order"
+    PAYMENT = "payment"
+    SYSTEM = "system"
+
+
 class CouponType(StrEnum):
     PERCENT = "percent"
     FIXED = "fixed"
+
+
+class ContactStatus(StrEnum):
+    NEW = "new"
+    READ = "read"
+    REPLIED = "replied"
 
 
 class TokenType(StrEnum):

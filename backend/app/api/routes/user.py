@@ -94,14 +94,14 @@ def get_users(
 @router.patch(
     "/{user_id}/role",
     response_model=SuccessResponse[UserResponse],
-    dependencies=[Depends(get_current_admin_user)],
 )
 def update_user_role(
     user_id: UUID,
     payload: UserRoleUpdateRequest,
+    current_admin: User = Depends(get_current_admin_user),
     user_service: UserService = Depends(get_user_service),
 ):
-    updated = user_service.update_user_role(user_id, payload.role)
+    updated = user_service.update_user_role(user_id, payload.role, current_admin)
 
     return SuccessResponse(
         message="User role updated successfully",
@@ -125,6 +125,6 @@ def delete_user(
             error_code="FORBIDDEN",
         )
 
-    user_service.delete_user(user_id)
+    user_service.delete_user(user_id, current_user)
 
     return MessageResponse(message="User deleted successfully")

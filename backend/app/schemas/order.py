@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import OrderStatus, PaymentMethod
+from app.models.enums import OrderStatus, PaymentMethod, PaymentStatus
 
 
 class OrderItemRequest(BaseModel):
@@ -50,6 +50,11 @@ class ShippingAddressResponse(BaseModel):
     country: str
 
 
+class OrderStatusEventResponse(BaseModel):
+    status: OrderStatus
+    at: datetime
+
+
 class OrderResponse(BaseModel):
     id: UUID
     number: str
@@ -61,10 +66,14 @@ class OrderResponse(BaseModel):
     discount: float
     total: float
     payment_method: PaymentMethod
+    payment_status: PaymentStatus = PaymentStatus.UNPAID
+    payment_reference: str | None = None
+    paid_at: datetime | None = None
     coupon_code: str | None
     shipping_address: ShippingAddressResponse
     notes: str | None
     eta: str | None
+    status_history: list[OrderStatusEventResponse] = Field(default_factory=list)
     delivered_at: datetime | None
     created_at: datetime
     updated_at: datetime

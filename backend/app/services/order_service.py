@@ -4,14 +4,16 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from app.core.exceptions import AppException
-from app.models.enums import OrderStatus, UserRole
+from app.models.enums import NotificationType, OrderStatus, UserRole
 from app.models.order import Order
 from app.models.user import User
 from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
 from app.schemas.order import OrderCreateRequest, OrderStatusUpdate
 from app.schemas.user import PaginationMeta
+from app.services.audit_service import AuditService
 from app.services.coupon_service import CouponService
+from app.services.notification_service import NotificationService
 
 FREE_SHIPPING_THRESHOLD = 200000
 SHIPPING_FLAT_RATE = 15000
@@ -23,10 +25,20 @@ class OrderService:
         order_repository: OrderRepository,
         product_repository: ProductRepository,
         coupon_service: CouponService,
+        audit_service: AuditService | None = None,
+        notification_service: NotificationService | None = None,
     ):
         self.order_repository = order_repository
         self.product_repository = product_repository
         self.coupon_service = coupon_service
+        self.audit_service = audit_service
+        self.notification_service = notification_service
+
+    def _status_event(self, status: OrderStatus) -> dict:
+        return {
+            "status": status.value,
+            "at": datetime.now(timezone.utc).isoformat(),
+        }
 
     # -------------------------
     # GET MY ORDERS
@@ -228,12 +240,36 @@ class OrderService:
             coupon_code=coupon_code,
             notes=request.notes,
             status=OrderStatus.PENDING,
+            status_history=[self._status_event(OrderStatus.PENDING)],
         )
 
         created = self.order_repository.create_order(db_order)
 
         for item in request.items:
             self.product_repository.record_sale(item.product_id, item.quantity)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=user,
+                action="CREATE",
+                resource_type="order",
+                resource_id=created.id,
+                summary=f"Order {created.number} placed with {len(created.items or [])} item(s)",
+                after={
+                    "number": created.number,
+                    "total": float(created.total),
+                    "status": created.status.value,
+                },
+            )
+
+        if self.notification_service:
+            self.notification_service.notify(
+                user_id=user.id,
+                notification_type=NotificationType.ORDER,
+                title="Order placed",
+                body=f"Your order {created.number} has been received and is pending confirmation.",
+                link=f"/account/orders/{created.id}",
+            )
 
         return created
 
@@ -265,6 +301,10 @@ class OrderService:
             )
 
         order.status = OrderStatus.CANCELLED
+        order.status_history = [
+            *(order.status_history or []),
+            self._status_event(OrderStatus.CANCELLED),
+        ]
         updated = self.order_repository.update_order(order)
 
         for item in order.items or []:
@@ -273,6 +313,25 @@ class OrderService:
                     UUID(item["product_id"]),
                     item.get("quantity", 0),
                 )
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=current_user,
+                action="STATUS_CHANGE",
+                resource_type="order",
+                resource_id=order.id,
+                summary=f"Order {order.number} cancelled",
+                after={"status": OrderStatus.CANCELLED.value},
+            )
+
+        if self.notification_service:
+            self.notification_service.notify(
+                user_id=order.user_id,
+                notification_type=NotificationType.ORDER,
+                title="Order cancelled",
+                body=f"Your order {order.number} has been cancelled.",
+                link=f"/account/orders/{order.id}",
+            )
 
         return updated
 
@@ -301,7 +360,12 @@ class OrderService:
                 error_code="FORBIDDEN",
             )
 
+        previous_status = order.status
         order.status = payload.status
+        order.status_history = [
+            *(order.status_history or []),
+            self._status_event(payload.status),
+        ]
 
         if payload.status == OrderStatus.SHIPPED:
             order.eta = "3-5 days"
@@ -309,7 +373,29 @@ class OrderService:
         if payload.status == OrderStatus.DELIVERED:
             order.delivered_at = datetime.now(timezone.utc)
 
-        return self.order_repository.update_order(order)
+        updated = self.order_repository.update_order(order)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=current_user,
+                action="STATUS_CHANGE",
+                resource_type="order",
+                resource_id=order.id,
+                summary=f"Order {order.number} moved from {previous_status.value} to {payload.status.value}",
+                before={"status": previous_status.value},
+                after={"status": payload.status.value},
+            )
+
+        if self.notification_service:
+            self.notification_service.notify(
+                user_id=order.user_id,
+                notification_type=NotificationType.ORDER,
+                title=f"Order {payload.status.value}",
+                body=f"Your order {order.number} is now {payload.status.value}.",
+                link=f"/account/orders/{order.id}",
+            )
+
+        return updated
 
     # -------------------------
     # HELPERS

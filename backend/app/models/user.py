@@ -11,6 +11,7 @@ from app.models.enums import AuthProvider, UserRole
 
 if TYPE_CHECKING:
     from app.models.blog_post import BlogPost
+    from app.models.notification import Notification
     from app.models.order import Order
     from app.models.payment_method import PaymentMethod
     from app.models.product import Product
@@ -66,3 +67,4 @@ class User(Base):
     blog_posts: Mapped[list["BlogPost"]] = relationship(back_populates="author_user", passive_deletes=True)
     payment_methods: Mapped[list["PaymentMethod"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    notifications: Mapped[list["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")

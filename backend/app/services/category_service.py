@@ -5,8 +5,10 @@ from slugify import slugify
 
 from app.core.exceptions import AppException
 from app.models.category import Category
+from app.models.user import User
 from app.repositories.category_repository import CategoryRepository
 from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.services.audit_service import AuditService
 
 CATEGORY_PALETTES = {
     "cattle": ("#2f5d3f", "#7d8f4d"),
@@ -40,8 +42,9 @@ def _svg_image(emoji: str, accent: str | None) -> str:
 
 
 class CategoryService:
-    def __init__(self, repository: CategoryRepository):
+    def __init__(self, repository: CategoryRepository, audit_service: AuditService | None = None):
         self.repository = repository
+        self.audit_service = audit_service
 
     # -------------------------
     # GET ALL CATEGORIES
@@ -97,7 +100,7 @@ class CategoryService:
     # -------------------------
     # CREATE CATEGORY
     # -------------------------
-    def create_category(self, category: CategoryCreate) -> Category:
+    def create_category(self, category: CategoryCreate, actor: User | None = None) -> Category:
         name = category.name.strip()
         slug = category.slug.strip() if category.slug else slugify(name)
 
@@ -113,12 +116,24 @@ class CategoryService:
 
         db_category = Category(**payload, name=name, slug=slug)
 
-        return self.repository.create_category(db_category)
+        created = self.repository.create_category(db_category)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="CREATE",
+                resource_type="category",
+                resource_id=created.id,
+                summary=f"Created category \"{created.name}\"",
+                after={"name": created.name, "slug": created.slug},
+            )
+
+        return created
 
     # -------------------------
     # UPDATE CATEGORY
     # -------------------------
-    def update_category(self, category_id: UUID, category: CategoryUpdate) -> Category:
+    def update_category(self, category_id: UUID, category: CategoryUpdate, actor: User | None = None) -> Category:
         db_category = self.get_category_by_id(category_id)
 
         updates = category.model_dump(exclude_unset=True)
@@ -141,12 +156,24 @@ class CategoryService:
                 db_category.accent,
             )
 
-        return self.repository.update_category(db_category)
+        updated = self.repository.update_category(db_category)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="UPDATE",
+                resource_type="category",
+                resource_id=db_category.id,
+                summary=f"Updated category \"{db_category.name}\"",
+                after={"name": db_category.name, "changes": list(updates.keys())},
+            )
+
+        return updated
 
     # -------------------------
     # DELETE CATEGORY
     # -------------------------
-    def delete_category(self, category_id: UUID) -> Category:
+    def delete_category(self, category_id: UUID, actor: User | None = None) -> Category:
         db_category = self.get_category_by_id(category_id)
 
         if db_category.product_count > 0:
@@ -156,7 +183,19 @@ class CategoryService:
                 error_code="CATEGORY_HAS_PRODUCTS",
             )
 
-        return self.repository.delete_category(db_category)
+        deleted = self.repository.delete_category(db_category)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="DELETE",
+                resource_type="category",
+                resource_id=db_category.id,
+                summary=f"Deleted category \"{db_category.name}\"",
+                before={"name": db_category.name, "slug": db_category.slug},
+            )
+
+        return deleted
 
     # -------------------------
     # RECALCULATE PRODUCT COUNT

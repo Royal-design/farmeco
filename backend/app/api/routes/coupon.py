@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_admin_user
 from app.api.dependencies.services import get_coupon_service
+from app.models.user import User
 from app.schemas.coupon import (
     CouponCreate,
     CouponResponse,
@@ -54,13 +55,13 @@ def get_coupons(
     "",
     response_model=SuccessResponse[CouponResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(get_current_admin_user)],
 )
 def create_coupon(
     payload: CouponCreate,
+    current_admin: User = Depends(get_current_admin_user),
     coupon_service: CouponService = Depends(get_coupon_service),
 ):
-    coupon = coupon_service.create_coupon(payload)
+    coupon = coupon_service.create_coupon(payload, current_admin)
 
     return SuccessResponse(
         message="Coupon created successfully",
@@ -74,14 +75,14 @@ def create_coupon(
 @router.put(
     "/{coupon_id}",
     response_model=SuccessResponse[CouponResponse],
-    dependencies=[Depends(get_current_admin_user)],
 )
 def update_coupon(
     coupon_id: UUID,
     payload: CouponUpdate,
+    current_admin: User = Depends(get_current_admin_user),
     coupon_service: CouponService = Depends(get_coupon_service),
 ):
-    coupon = coupon_service.update_coupon(coupon_id, payload)
+    coupon = coupon_service.update_coupon(coupon_id, payload, current_admin)
 
     return SuccessResponse(
         message="Coupon updated successfully",
@@ -95,12 +96,12 @@ def update_coupon(
 @router.delete(
     "/{coupon_id}",
     response_model=MessageResponse,
-    dependencies=[Depends(get_current_admin_user)],
 )
 def delete_coupon(
     coupon_id: UUID,
+    current_admin: User = Depends(get_current_admin_user),
     coupon_service: CouponService = Depends(get_coupon_service),
 ):
-    coupon_service.delete_coupon(coupon_id)
+    coupon_service.delete_coupon(coupon_id, current_admin)
 
     return MessageResponse(message="Coupon deleted successfully")

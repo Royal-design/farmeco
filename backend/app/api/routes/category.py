@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.api.dependencies.auth import get_current_admin_user
 from app.api.dependencies.services import get_category_service
+from app.models.user import User
 from app.schemas.category import CategoryCreate, CategoryResponse, CategoryUpdate
 from app.schemas.response import MessageResponse, SuccessResponse
 from app.services.category_service import CategoryService
@@ -87,13 +88,13 @@ def get_category_by_id(
     "",
     response_model=SuccessResponse[CategoryResponse],
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(get_current_admin_user)],
 )
 def create_category(
     payload: CategoryCreate,
+    current_admin: User = Depends(get_current_admin_user),
     category_service: CategoryService = Depends(get_category_service),
 ):
-    category = category_service.create_category(payload)
+    category = category_service.create_category(payload, current_admin)
 
     return SuccessResponse(
         message="Category created successfully",
@@ -107,14 +108,14 @@ def create_category(
 @router.put(
     "/{category_id}",
     response_model=SuccessResponse[CategoryResponse],
-    dependencies=[Depends(get_current_admin_user)],
 )
 def update_category(
     category_id: UUID,
     payload: CategoryUpdate,
+    current_admin: User = Depends(get_current_admin_user),
     category_service: CategoryService = Depends(get_category_service),
 ):
-    category = category_service.update_category(category_id, payload)
+    category = category_service.update_category(category_id, payload, current_admin)
 
     return SuccessResponse(
         message="Category updated successfully",
@@ -128,12 +129,12 @@ def update_category(
 @router.delete(
     "/{category_id}",
     response_model=MessageResponse,
-    dependencies=[Depends(get_current_admin_user)],
 )
 def delete_category(
     category_id: UUID,
+    current_admin: User = Depends(get_current_admin_user),
     category_service: CategoryService = Depends(get_category_service),
 ):
-    category_service.delete_category(category_id)
+    category_service.delete_category(category_id, current_admin)
 
     return MessageResponse(message="Category deleted successfully")

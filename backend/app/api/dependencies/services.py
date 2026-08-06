@@ -2,16 +2,19 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.repositories.audit_repository import AuditLogRepository
 from app.repositories.blog_repository import BlogRepository
 from app.repositories.category_repository import CategoryRepository
 from app.repositories.contact_repository import ContactRepository
 from app.repositories.coupon_repository import CouponRepository
 from app.repositories.order_repository import OrderRepository
+from app.repositories.notification_repository import NotificationRepository
 from app.repositories.payment_method_repository import PaymentMethodRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.refresh_token_repository import RefreshTokenRepository
 from app.repositories.review_repository import ReviewRepository
 from app.repositories.user_repository import UserRepository
+from app.services.audit_service import AuditService
 from app.services.auth_service import AuthService
 from app.services.blog_service import BlogService
 from app.services.category_service import CategoryService
@@ -20,7 +23,9 @@ from app.services.contact_service import ContactService
 from app.services.coupon_service import CouponService
 from app.services.email_service import EmailService
 from app.services.order_service import OrderService
+from app.services.notification_service import NotificationService
 from app.services.payment_method_service import PaymentMethodService
+from app.services.payment_service import PaymentService
 from app.services.product_service import ProductService
 from app.services.refresh_token_service import RefreshTokenService
 from app.services.review_service import ReviewService
@@ -37,7 +42,15 @@ def get_upload_service() -> UploadService:
 
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:
-    return UserService(UserRepository(db), CloudinaryService())
+    return UserService(
+        UserRepository(db),
+        CloudinaryService(),
+        get_audit_service(db),
+    )
+
+
+def get_audit_service(db: Session = Depends(get_db)) -> AuditService:
+    return AuditService(AuditLogRepository(db))
 
 
 def get_email_service() -> EmailService:
@@ -63,7 +76,7 @@ def get_refresh_token_service(db: Session = Depends(get_db)) -> RefreshTokenServ
 
 
 def get_category_service(db: Session = Depends(get_db)) -> CategoryService:
-    return CategoryService(CategoryRepository(db))
+    return CategoryService(CategoryRepository(db), get_audit_service(db))
 
 
 def get_product_service(db: Session = Depends(get_db)) -> ProductService:
@@ -71,6 +84,7 @@ def get_product_service(db: Session = Depends(get_db)) -> ProductService:
         ProductRepository(db),
         get_category_service(db),
         CloudinaryService(),
+        get_audit_service(db),
     )
 
 
@@ -79,7 +93,18 @@ def get_review_service(db: Session = Depends(get_db)) -> ReviewService:
 
 
 def get_coupon_service(db: Session = Depends(get_db)) -> CouponService:
-    return CouponService(CouponRepository(db))
+    return CouponService(CouponRepository(db), get_audit_service(db))
+
+
+def get_notification_service(db: Session = Depends(get_db)) -> NotificationService:
+    return NotificationService(NotificationRepository(db))
+
+
+def get_payment_service(db: Session = Depends(get_db)) -> PaymentService:
+    return PaymentService(
+        OrderRepository(db),
+        get_notification_service(db),
+    )
 
 
 def get_order_service(db: Session = Depends(get_db)) -> OrderService:
@@ -87,6 +112,8 @@ def get_order_service(db: Session = Depends(get_db)) -> OrderService:
         OrderRepository(db),
         ProductRepository(db),
         get_coupon_service(db),
+        get_audit_service(db),
+        get_notification_service(db),
     )
 
 
@@ -95,7 +122,12 @@ def get_blog_service(db: Session = Depends(get_db)) -> BlogService:
 
 
 def get_contact_service(db: Session = Depends(get_db)) -> ContactService:
-    return ContactService(ContactRepository(db))
+    return ContactService(
+        ContactRepository(db),
+        get_email_service(),
+        get_audit_service(db),
+        get_notification_service(db),
+    )
 
 
 def get_payment_method_service(db: Session = Depends(get_db)) -> PaymentMethodService:

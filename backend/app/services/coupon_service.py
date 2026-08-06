@@ -3,6 +3,7 @@ from uuid import UUID
 
 from app.core.exceptions import AppException
 from app.models.coupon import Coupon
+from app.models.user import User
 from app.repositories.coupon_repository import CouponRepository
 from app.schemas.coupon import (
     CouponCreate,
@@ -10,11 +11,13 @@ from app.schemas.coupon import (
     CouponValidateRequest,
     CouponValidateResponse,
 )
+from app.services.audit_service import AuditService
 
 
 class CouponService:
-    def __init__(self, repository: CouponRepository):
+    def __init__(self, repository: CouponRepository, audit_service: AuditService | None = None):
         self.repository = repository
+        self.audit_service = audit_service
 
     # -------------------------
     # GET ALL COUPONS (ADMIN)
@@ -80,7 +83,7 @@ class CouponService:
     # -------------------------
     # CREATE COUPON
     # -------------------------
-    def create_coupon(self, coupon: CouponCreate) -> Coupon:
+    def create_coupon(self, coupon: CouponCreate, actor: User | None = None) -> Coupon:
         code = coupon.code.strip().upper()
 
         if self.repository.get_by_code(code):
@@ -95,12 +98,24 @@ class CouponService:
             code=code,
         )
 
-        return self.repository.create_coupon(db_coupon)
+        created = self.repository.create_coupon(db_coupon)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="CREATE",
+                resource_type="coupon",
+                resource_id=created.id,
+                summary=f"Created coupon \"{created.code}\"",
+                after={"code": created.code, "value": float(created.value)},
+            )
+
+        return created
 
     # -------------------------
     # UPDATE COUPON
     # -------------------------
-    def update_coupon(self, coupon_id: UUID, coupon: CouponUpdate) -> Coupon:
+    def update_coupon(self, coupon_id: UUID, coupon: CouponUpdate, actor: User | None = None) -> Coupon:
         db_coupon = self.get_coupon_by_id(coupon_id)
 
         updates = coupon.model_dump(exclude_unset=True)
@@ -119,11 +134,36 @@ class CouponService:
         for key, value in updates.items():
             setattr(db_coupon, key, value)
 
-        return self.repository.update_coupon(db_coupon)
+        updated = self.repository.update_coupon(db_coupon)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="UPDATE",
+                resource_type="coupon",
+                resource_id=db_coupon.id,
+                summary=f"Updated coupon \"{db_coupon.code}\"",
+                after={"code": db_coupon.code, "changes": list(updates.keys())},
+            )
+
+        return updated
 
     # -------------------------
     # DELETE COUPON
     # -------------------------
-    def delete_coupon(self, coupon_id: UUID) -> Coupon:
+    def delete_coupon(self, coupon_id: UUID, actor: User | None = None) -> Coupon:
         db_coupon = self.get_coupon_by_id(coupon_id)
-        return self.repository.delete_coupon(db_coupon)
+
+        deleted = self.repository.delete_coupon(db_coupon)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="DELETE",
+                resource_type="coupon",
+                resource_id=db_coupon.id,
+                summary=f"Deleted coupon \"{db_coupon.code}\"",
+                before={"code": db_coupon.code},
+            )
+
+        return deleted

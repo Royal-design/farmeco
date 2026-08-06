@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig } from "axios"
+import { toast } from "sonner"
 
 import {
   clearStoredSession,
@@ -82,18 +83,34 @@ function toApiError(error: AxiosError<ApiEnvelope<unknown>>): ApiError {
   }
 }
 
+async function forceSessionExpiry(): Promise<void> {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  const { useAuthStore } = await import("@/store/auth-store")
+  useAuthStore.getState().expireSession()
+
+  const alreadyOnLogin = window.location.pathname.startsWith("/login")
+  if (!alreadyOnLogin) {
+    toast.error("Session expired", {
+      description: "Your session has timed out. Please sign in again to continue.",
+    })
+    const redirect = encodeURIComponent(
+      window.location.pathname + window.location.search
+    )
+    window.location.assign(`/login?redirect=${redirect}`)
+  }
+}
+
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiEnvelope<unknown>>) => {
     const original = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined
     const status = error.response?.status
+    const isAuthUrl = original?.url?.includes("/auth/") ?? false
 
-    if (
-      status === 401 &&
-      original &&
-      !original._retry &&
-      !original.url?.includes("/auth/")
-    ) {
+    if (status === 401 && original && !original._retry && !isAuthUrl) {
       original._retry = true
       const token = await refreshAccessToken()
       if (token) {
@@ -103,6 +120,10 @@ http.interceptors.response.use(
         }
         return http(original)
       }
+    }
+
+    if (status === 401 && original && !isAuthUrl) {
+      await forceSessionExpiry()
     }
 
     throw toApiError(error)

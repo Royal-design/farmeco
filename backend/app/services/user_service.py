@@ -8,13 +8,20 @@ from app.models.enums import UserRole
 from app.models.user import DEFAULT_PREFERENCES, User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import PaginationMeta, RegisterRequest, UserUpdateRequest
+from app.services.audit_service import AuditService
 from app.services.cloudinary_service import CloudinaryService
 
 
 class UserService:
-    def __init__(self, repository: UserRepository, cloudinary: CloudinaryService):
+    def __init__(
+        self,
+        repository: UserRepository,
+        cloudinary: CloudinaryService,
+        audit_service: AuditService | None = None,
+    ):
         self.repository = repository
         self.cloudinary = cloudinary
+        self.audit_service = audit_service
 
     # -------------------------
     # GET ALL USERS (ADMIN)
@@ -138,10 +145,24 @@ class UserService:
     # -------------------------
     # UPDATE USER ROLE (ADMIN ONLY)
     # -------------------------
-    def update_user_role(self, user_id: UUID, role: UserRole) -> User:
+    def update_user_role(self, user_id: UUID, role: UserRole, actor: User | None = None) -> User:
         db_user = self.get_user_by_id(user_id)
+        previous_role = db_user.role
         db_user.role = role
-        return self.repository.update_user(db_user)
+        updated = self.repository.update_user(db_user)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="UPDATE",
+                resource_type="user",
+                resource_id=db_user.id,
+                summary=f"Changed role of {db_user.email} from {previous_role.value} to {role.value}",
+                before={"role": previous_role.value},
+                after={"role": role.value},
+            )
+
+        return updated
 
     # -------------------------
     # SAVE USER (for auth service)
@@ -152,6 +173,19 @@ class UserService:
     # -------------------------
     # DELETE USER
     # -------------------------
-    def delete_user(self, user_id: UUID) -> User:
+    def delete_user(self, user_id: UUID, actor: User | None = None) -> User:
         user = self.get_user_by_id(user_id)
-        return self.repository.delete_user(user)
+
+        deleted = self.repository.delete_user(user)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=actor,
+                action="DELETE",
+                resource_type="user",
+                resource_id=user.id,
+                summary=f"Deleted user {user.email}",
+                before={"email": user.email, "role": user.role.value},
+            )
+
+        return deleted

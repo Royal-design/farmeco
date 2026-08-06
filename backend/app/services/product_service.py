@@ -10,6 +10,7 @@ from app.models.user import User
 from app.repositories.product_repository import ProductRepository
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.schemas.user import PaginationMeta
+from app.services.audit_service import AuditService
 from app.services.category_service import CategoryService
 from app.services.cloudinary_service import CloudinaryService
 
@@ -20,10 +21,12 @@ class ProductService:
         product_repository: ProductRepository,
         category_service: CategoryService,
         cloudinary_service: CloudinaryService,
+        audit_service: AuditService | None = None,
     ):
         self.product_repository = product_repository
         self.category_service = category_service
         self.cloudinary_service = cloudinary_service
+        self.audit_service = audit_service
 
     # -------------------------
     # GET ALL PRODUCTS
@@ -154,6 +157,16 @@ class ProductService:
         created = self.product_repository.create_product(db_product)
         self.category_service.recalculate_product_count(product.category_id)
 
+        if self.audit_service:
+            self.audit_service.record(
+                actor=seller,
+                action="CREATE",
+                resource_type="product",
+                resource_id=created.id,
+                summary=f"Created product \"{created.name}\"",
+                after={"name": created.name, "slug": created.slug, "price": float(created.price)},
+            )
+
         return created
 
     # -------------------------
@@ -202,6 +215,16 @@ class ProductService:
             self.category_service.recalculate_product_count(old_category_id)
             self.category_service.recalculate_product_count(updates["category_id"])
 
+        if self.audit_service:
+            self.audit_service.record(
+                actor=current_user,
+                action="UPDATE",
+                resource_type="product",
+                resource_id=db_product.id,
+                summary=f"Updated product \"{db_product.name}\"",
+                after={"name": db_product.name, "price": float(db_product.price), "changes": list(updates.keys())},
+            )
+
         return updated
 
     # -------------------------
@@ -214,6 +237,16 @@ class ProductService:
 
         deleted = self.product_repository.delete_product(product)
         self.category_service.recalculate_product_count(product.category_id)
+
+        if self.audit_service:
+            self.audit_service.record(
+                actor=current_user,
+                action="DELETE",
+                resource_type="product",
+                resource_id=product.id,
+                summary=f"Deleted product \"{product.name}\"",
+                before={"name": product.name, "slug": product.slug},
+            )
 
         return deleted
 

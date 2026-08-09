@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next"
 import { Fraunces, Geist_Mono, Inter } from "next/font/google"
+import Script from "next/script"
 
 import "@/app/globals.css"
-import { AppProviders } from "@/providers/app-providers"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
+import { AppProviders } from "@/providers/app-providers"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -48,8 +49,8 @@ export const metadata: Metadata = {
   publisher: siteConfig.name,
   formatDetection: { email: false, address: false, telephone: false },
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    shortcut: "/icon.svg",
+    icon: [{ url: "/farmeco.webp", type: "image/webp" }],
+    shortcut: "/farmeco.webp",
   },
   openGraph: {
     type: "website",
@@ -123,7 +124,7 @@ export default function RootLayout({
                   "@type": "Organization",
                   name: siteConfig.name,
                   url: siteConfig.url,
-                  logo: `${siteConfig.url}/icon.svg`,
+                  logo: `${siteConfig.url}/farmeco.webp`,
                   description: siteConfig.description,
                   contactPoint: {
                     "@type": "ContactPoint",
@@ -152,6 +153,21 @@ export default function RootLayout({
           }}
         />
         <AppProviders>{children}</AppProviders>
+        <Script
+          id="tawk-to"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a78451410d8bc1d46275ee3/1jvisrm7v';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();`,
+          }}
+        />
       </body>
     </html>
   )

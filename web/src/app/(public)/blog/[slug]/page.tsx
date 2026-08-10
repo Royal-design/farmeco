@@ -10,6 +10,7 @@ import { Avatar } from "@/components/ui/avatar"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { GradientOrb } from "@/components/shared/gradient-orb"
 import { NewsletterForm } from "@/features/newsletter/components/newsletter-form"
+import { BlogGallery } from "@/features/blog/components/blog-gallery"
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>
@@ -109,7 +110,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
 
         <div className="mx-auto max-w-3xl px-5 py-10 sm:px-8">
-          {post.coverImage ? (
+          {post.images.length > 1 ? (
+            <BlogGallery images={post.images} title={post.title} />
+          ) : post.coverImage ? (
             <Image
               src={post.coverImage}
               alt={post.title}

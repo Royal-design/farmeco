@@ -152,6 +152,7 @@ export interface RawBlogPost {
   excerpt: string
   content: string[]
   cover_image: string | null
+  images: string[]
   category: string
   tags: string[]
   featured: boolean
@@ -333,6 +334,11 @@ export function mapBlogPost(raw: RawBlogPost): BlogPost {
     excerpt: raw.excerpt,
     content: raw.content ?? [],
     coverImage: raw.cover_image ?? "",
+    images: raw.images?.length
+      ? raw.images
+      : raw.cover_image
+        ? [raw.cover_image]
+        : [],
     category: raw.category,
     author: {
       name: raw.author.name,

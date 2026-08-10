@@ -90,8 +90,14 @@ class BlogService:
     # CREATE POST
     # -------------------------
     def create_post(self, post: BlogPostCreate, current_user: User) -> BlogPost:
+        data = post.model_dump()
+        images = data.pop("images", [])
+        if images:
+            data["cover_image"] = images[0]
+
         db_post = BlogPost(
-            **post.model_dump(),
+            **data,
+            images=images,
             slug=self._generate_unique_slug(post.title),
             read_time=self._estimate_read_time(post.content),
             author_id=current_user.id,
@@ -109,6 +115,7 @@ class BlogService:
         db_post = self.get_post_by_id(post_id)
 
         updates = post.model_dump(exclude_unset=True)
+        images = updates.pop("images", None)
 
         if "title" in updates and updates["title"] != db_post.title:
             updates["slug"] = self._generate_unique_slug(updates["title"])
@@ -118,6 +125,10 @@ class BlogService:
 
         for key, value in updates.items():
             setattr(db_post, key, value)
+
+        if images is not None:
+            db_post.images = images
+            db_post.cover_image = images[0] if images else db_post.cover_image
 
         return self.repository.update_post(db_post)
 

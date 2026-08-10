@@ -97,6 +97,9 @@ class CategoryService:
 
         return category
 
+    def get_category_by_name(self, name: str) -> Category | None:
+        return self.repository.get_category_by_name(name)
+
     # -------------------------
     # CREATE CATEGORY
     # -------------------------

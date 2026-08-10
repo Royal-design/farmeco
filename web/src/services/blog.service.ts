@@ -18,6 +18,7 @@ export interface BlogPostInput {
   tags?: string[]
   featured?: boolean
   coverImage?: string
+  images?: string[]
 }
 
 function toPayload(input: Partial<BlogPostInput>): Record<string, unknown> {
@@ -29,6 +30,7 @@ function toPayload(input: Partial<BlogPostInput>): Record<string, unknown> {
     tags: input.tags,
     featured: input.featured,
     cover_image: input.coverImage,
+    images: input.images,
   }
 }
 

@@ -23,6 +23,7 @@ class BlogPost(Base):
     content: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
 
     cover_image: Mapped[str | None] = mapped_column(Text)
+    images: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     category: Mapped[str] = mapped_column(String, nullable=False)
     tags: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     featured: Mapped[bool] = mapped_column(Boolean, default=False)

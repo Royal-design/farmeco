@@ -12,6 +12,7 @@ class BlogPostBase(BaseModel):
     tags: list[str] = Field(default_factory=list)
     featured: bool = False
     cover_image: str | None = None
+    images: list[str] = Field(default_factory=list)
 
 
 class BlogPostCreate(BlogPostBase):
@@ -26,6 +27,7 @@ class BlogPostUpdate(BaseModel):
     tags: list[str] | None = None
     featured: bool | None = None
     cover_image: str | None = None
+    images: list[str] | None = None
 
 
 class BlogPostAuthorResponse(BaseModel):

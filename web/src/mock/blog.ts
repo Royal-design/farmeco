@@ -152,4 +152,7 @@ export const blogPosts: BlogPost[] = [
       "Finally, use the report in negotiation. A clean bill of health is worth full price. A small, documented issue is worth a conversation. Either way, you buy with your eyes open.",
     ],
   },
-]
+].map((post) => ({
+  ...post,
+  images: post.coverImage ? [post.coverImage] : [],
+}))

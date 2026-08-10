@@ -11,6 +11,7 @@ import { blogService } from "@/services/blog.service"
 import { getErrorMessage } from "@/lib/errors"
 import { formatDate } from "@/utils/format"
 import { PageHeader } from "@/features/admin/components/page-header"
+import { BulkImport } from "@/features/admin/components/bulk-import"
 import { ConfirmDialog } from "@/features/admin/components/confirm-dialog"
 import {
   Table,
@@ -64,10 +65,13 @@ function AdminBlogPage() {
         title="Blog"
         description="Write guides and news for the Farmeco community."
         actions={
-          <ButtonLink href="/admin/blog/new">
-            <PlusIcon />
-            New post
-          </ButtonLink>
+          <>
+            <BulkImport entity="blog-posts" />
+            <ButtonLink href="/admin/blog/new">
+              <PlusIcon />
+              New post
+            </ButtonLink>
+          </>
         }
       />
 

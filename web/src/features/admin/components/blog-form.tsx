@@ -69,6 +69,7 @@ function BlogForm({
         content: paragraphs,
         featured,
         coverImage: coverImages[0] ?? undefined,
+        images: coverImages,
       }
 
       return isEdit && post

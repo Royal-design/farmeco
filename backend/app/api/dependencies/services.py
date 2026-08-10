@@ -18,6 +18,7 @@ from app.repositories.user_repository import UserRepository
 from app.services.audit_service import AuditService
 from app.services.auth_service import AuthService
 from app.services.blog_service import BlogService
+from app.services.bulk_import_service import BulkImportService
 from app.services.category_service import CategoryService
 from app.services.cloudinary_service import CloudinaryService
 from app.services.contact_service import ContactService
@@ -129,6 +130,15 @@ def get_shipping_setting_service(db: Session = Depends(get_db)) -> ShippingSetti
 
 def get_blog_service(db: Session = Depends(get_db)) -> BlogService:
     return BlogService(BlogRepository(db))
+
+
+def get_bulk_import_service(db: Session = Depends(get_db)) -> BulkImportService:
+    return BulkImportService(
+        product_service=get_product_service(db),
+        category_service=get_category_service(db),
+        coupon_service=get_coupon_service(db),
+        blog_service=get_blog_service(db),
+    )
 
 
 def get_contact_service(db: Session = Depends(get_db)) -> ContactService:

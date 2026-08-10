@@ -11,6 +11,7 @@ export interface BlogPost {
   excerpt: string
   content: string[]
   coverImage: string
+  images: string[]
   category: string
   author: BlogAuthor
   publishedAt: string

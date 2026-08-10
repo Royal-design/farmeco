@@ -142,6 +142,8 @@ async function request<T>(config: AxiosRequestConfig): Promise<ApiResult<T>> {
   return { data: payload as T }
 }
 
+export { http }
+
 export const api = {
   get: <T>(url: string, params?: Record<string, unknown>) =>
     request<T>({ method: "GET", url, params }),

@@ -13,6 +13,7 @@ import { getErrorMessage } from "@/lib/errors"
 import { formatPrice } from "@/utils/format"
 import { useDebounce } from "@/hooks/use-debounce"
 import { PageHeader } from "@/features/admin/components/page-header"
+import { BulkImport } from "@/features/admin/components/bulk-import"
 import { ProductBadges } from "@/features/admin/components/product-badges"
 import { ConfirmDialog } from "@/features/admin/components/confirm-dialog"
 import {
@@ -101,10 +102,13 @@ function ProductsView({
             : "Manage every listing on the marketplace."
         }
         actions={
-          <ButtonLink href={`${basePath}/new`}>
-            <PlusIcon />
-            Add product
-          </ButtonLink>
+          <>
+            <BulkImport entity="products" />
+            <ButtonLink href={`${basePath}/new`}>
+              <PlusIcon />
+              Add product
+            </ButtonLink>
+          </>
         }
       />
 

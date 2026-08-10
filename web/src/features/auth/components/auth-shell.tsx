@@ -1,13 +1,12 @@
 "use client"
 
-import * as React from "react"
-import Link from "next/link"
+import { BadgeCheckIcon, ShieldCheckIcon, TruckIcon } from "lucide-react"
 import Image from "next/image"
-import { ShieldCheckIcon, TruckIcon, BadgeCheckIcon } from "lucide-react"
+import Link from "next/link"
+import * as React from "react"
 
-import { Logo } from "@/components/shared/logo"
 import { GradientOrb } from "@/components/shared/gradient-orb"
-import { gallery } from "@/mock/gallery"
+import { Logo } from "@/components/shared/logo"
 
 interface AuthShellProps {
   children: React.ReactNode
@@ -24,18 +23,16 @@ function AuthShell({ children }: AuthShellProps) {
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
         <Image
-          src={gallery.hero}
+          src='/bg.webp'
           alt=""
           fill
           sizes="50vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-brand/90 via-brand/70 to-night/90" />
-        <GradientOrb variant="honey" className="top-20 right-10 opacity-40" />
-        <GradientOrb variant="brand" className="bottom-10 left-10 opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/60 to-night/90" />
         <div className="relative flex h-full flex-col justify-between p-12">
           <div className="flex items-center gap-3">
-            <Logo showWordmark />
+            <Logo showWordmark textClassName="text-white" subTextClassName="text-white/80" />
           </div>
           <div className="space-y-6">
             <h2 className="font-heading text-4xl font-medium leading-tight text-balance text-white">

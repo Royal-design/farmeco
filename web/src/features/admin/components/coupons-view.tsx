@@ -10,6 +10,7 @@ import { couponsService } from "@/services/coupons.service"
 import { getErrorMessage } from "@/lib/errors"
 import { formatDate } from "@/utils/format"
 import { PageHeader } from "@/features/admin/components/page-header"
+import { BulkImport } from "@/features/admin/components/bulk-import"
 import { CouponForm } from "@/features/admin/components/coupon-form"
 import { ConfirmDialog } from "@/features/admin/components/confirm-dialog"
 import {
@@ -78,10 +79,13 @@ function AdminCouponsPage() {
         title="Coupons"
         description="Discount codes buyers can apply at checkout."
         actions={
-          <Button onClick={openCreate}>
-            <PlusIcon />
-            Add coupon
-          </Button>
+          <>
+            <BulkImport entity="coupons" />
+            <Button onClick={openCreate}>
+              <PlusIcon />
+              Add coupon
+            </Button>
+          </>
         }
       />
 

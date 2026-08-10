@@ -4,6 +4,7 @@ from app.api.routes.account import router as account_router
 from app.api.routes.audit import router as audit_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.blog import router as blog_router
+from app.api.routes.bulk import router as bulk_router
 from app.api.routes.category import router as category_router
 from app.api.routes.contact import router as contact_router
 from app.api.routes.coupon import router as coupon_router
@@ -30,6 +31,7 @@ def includes_api_routes(api: APIRouter):
     api.include_router(review_router, prefix="/api/v1/reviews", tags=["Reviews"])
     api.include_router(upload_router, prefix="/api/v1/uploads", tags=["Uploads"])
     api.include_router(blog_router, prefix="/api/v1/blog", tags=["Blog"])
+    api.include_router(bulk_router, prefix="/api/v1/bulk", tags=["Bulk import"])
     api.include_router(contact_router, prefix="/api/v1/contact", tags=["Contact"])
     api.include_router(settings_router, prefix="/api/v1/settings", tags=["Settings"])
     api.include_router(audit_router, prefix="/api/v1/audit-logs", tags=["Audit"])

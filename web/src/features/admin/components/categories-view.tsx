@@ -9,6 +9,7 @@ import type { Category } from "@/types/catalog"
 import { categoriesService } from "@/services/categories.service"
 import { getErrorMessage } from "@/lib/errors"
 import { PageHeader } from "@/features/admin/components/page-header"
+import { BulkImport } from "@/features/admin/components/bulk-import"
 import { CategoryForm } from "@/features/admin/components/category-form"
 import { ConfirmDialog } from "@/features/admin/components/confirm-dialog"
 import {
@@ -77,10 +78,13 @@ function AdminCategoriesPage() {
         title="Categories"
         description="Organise products across the marketplace."
         actions={
-          <Button onClick={openCreate}>
-            <PlusIcon />
-            Add category
-          </Button>
+          <>
+            <BulkImport entity="categories" />
+            <Button onClick={openCreate}>
+              <PlusIcon />
+              Add category
+            </Button>
+          </>
         }
       />
 

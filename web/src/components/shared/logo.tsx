@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 
 interface LogoProps {
   className?: string
+  textClassName?: string
+  subTextClassName?: string
   href?: string
   showWordmark?: boolean
 }
@@ -30,7 +32,7 @@ function LogoMark({ className }: { className?: string }) {
   )
 }
 
-function Logo({ className, href = "/", showWordmark = true }: LogoProps) {
+function Logo({ className, textClassName,subTextClassName, href = "/", showWordmark = true }: LogoProps) {
   return (
     <Link
       href={href}
@@ -39,11 +41,11 @@ function Logo({ className, href = "/", showWordmark = true }: LogoProps) {
     >
       <LogoMark />
       {showWordmark && (
-        <span className="flex flex-col leading-none">
-          <span className="font-heading text-lg font-semibold tracking-tight text-foreground">
+        <span className={cn("flex flex-col leading-none")}>
+          <span className={cn("font-heading text-lg font-semibold tracking-tight text-foreground", textClassName)}>
             Farm<span className="text-brand">eco</span>
           </span>
-          <span className="text-[0.6rem] font-medium tracking-[0.22em] text-muted-foreground uppercase">
+          <span className={cn("text-[0.6rem] font-medium tracking-[0.22em] text-muted-foreground uppercase", subTextClassName)}>
             Livestock marketplace
           </span>
         </span>

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { CheckCircleIcon, DownloadIcon, FileSpreadsheetIcon, LoaderIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -18,14 +18,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
+const invalidatedKeys: Record<BulkEntity, string[]> = {
+  products: ["products", "categories"],
+  categories: ["categories"],
+  coupons: ["coupons"],
+  "blog-posts": ["posts"],
+}
+
 function BulkImport({ entity }: { entity: BulkEntity }) {
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
   const [report, setReport] = React.useState<BulkImportReport | null>(null)
 
   const mutation = useMutation({
     mutationFn: (file: File) => bulkImportService.importFile(entity, file),
     onSuccess: (result) => {
       setReport(result)
+      for (const key of invalidatedKeys[entity]) {
+        queryClient.invalidateQueries({ queryKey: [key] })
+      }
       if (result.failed === 0) {
         toast.success(`Imported ${result.imported} of ${result.total} rows`)
       } else {

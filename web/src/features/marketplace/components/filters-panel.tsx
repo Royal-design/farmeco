@@ -1,21 +1,22 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { StarIcon, ChevronDownIcon, SlidersHorizontalIcon, XIcon } from "lucide-react"
+import { SlidersHorizontalIcon, StarIcon, XIcon } from "lucide-react"
 
-import { categoriesService } from "@/services/categories.service"
-import { cn } from "@/lib/utils"
-import { formatNumber } from "@/utils/format"
-import { priceBounds } from "@/constants/sorting"
-import { Button, ButtonLink } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Separator } from "@/components/ui/separator"
+import { ButtonLink } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { priceBounds } from "@/constants/sorting"
 import {
+  badgeOptions,
   type MarketplaceFilters,
   ratingOptions,
-  badgeOptions,
 } from "@/features/marketplace/types"
+import { cn } from "@/lib/utils"
+import { categoriesService } from "@/services/categories.service"
+import { formatNumber } from "@/utils/format"
+import Image from "next/image"
 
 interface FiltersProps {
   filters: MarketplaceFilters
@@ -76,10 +77,21 @@ function CategoryList({
                   : "text-foreground hover:bg-muted"
               )}
             >
-              <span className="flex items-center gap-2">
-                <span aria-hidden="true">{category.emoji}</span>
-                {category.name}
-              </span>
+              <div className="flex items-center gap-2">
+  {category.image ? (
+    <Image
+      src={category.image}
+      alt=""
+      width={16}
+      height={16}
+      className="h-4 w-4 rounded-full object-cover"
+    />
+  ) : category.emoji ? (
+    <span aria-hidden="true">{category.emoji}</span>
+  ) : null}
+
+  <span>{category.name}</span>
+</div>
               <span className="text-xs text-muted-foreground">
                 {formatNumber(category.productCount)}
               </span>

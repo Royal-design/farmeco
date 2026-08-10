@@ -1,17 +1,23 @@
 "use client"
 
-import * as React from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { PencilIcon, PlusIcon, TagsIcon, TrashIcon } from "lucide-react"
+import * as React from "react"
 import { toast } from "sonner"
 
-import type { Category } from "@/types/catalog"
-import { categoriesService } from "@/services/categories.service"
-import { getErrorMessage } from "@/lib/errors"
-import { PageHeader } from "@/features/admin/components/page-header"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Skeleton } from "@/components/ui/skeleton"
 import { BulkImport } from "@/features/admin/components/bulk-import"
 import { CategoryForm } from "@/features/admin/components/category-form"
 import { ConfirmDialog } from "@/features/admin/components/confirm-dialog"
+import { PageHeader } from "@/features/admin/components/page-header"
 import {
   Table,
   TableBody,
@@ -21,15 +27,10 @@ import {
   TableRow,
 } from "@/features/admin/components/table"
 import { TableEmpty } from "@/features/admin/components/table-empty"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { getErrorMessage } from "@/lib/errors"
+import { categoriesService } from "@/services/categories.service"
+import type { Category } from "@/types/catalog"
+import Image from "next/image"
 
 function AdminCategoriesPage() {
   const queryClient = useQueryClient()
@@ -117,9 +118,21 @@ function AdminCategoriesPage() {
                 <TableRow key={category.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-lg">
-                        {category.emoji || "🏷️"}
-                      </span>
+                      <span className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted text-lg">
+  {category.image ? (
+    <Image
+      src={category.image}
+      alt=""
+      width={36}
+      height={36}
+      className="size-full object-cover"
+    />
+  ) : category.emoji ? (
+    <span aria-hidden="true">{category.emoji}</span>
+  ) : (
+    <span aria-hidden="true">🏷️</span>
+  )}
+</span>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">
                           {category.name}

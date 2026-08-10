@@ -3,13 +3,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { ShieldCheckIcon, SparklesIcon } from "lucide-react"
 
-import { blogService } from "@/services/blog.service"
-import { BlogCard } from "@/features/blog/components/blog-card"
 import { AnimatedButton } from "@/components/shared/animated-button"
 import { GradientOrb } from "@/components/shared/gradient-orb"
-import { SectionHeading } from "@/components/shared/section-heading"
 import { Stagger, StaggerItem } from "@/components/shared/reveal"
+import { SectionHeading } from "@/components/shared/section-heading"
 import { Skeleton } from "@/components/ui/skeleton"
+import { BlogCard } from "@/features/blog/components/blog-card"
+import { blogService } from "@/services/blog.service"
 
 function RecentBlog() {
   const { data, isLoading } = useQuery({
@@ -56,14 +56,14 @@ function CtaSection() {
         <GradientOrb variant="honey" className="-top-20 -right-20 opacity-30" />
         <GradientOrb variant="brand" className="-bottom-24 -left-16 opacity-40" />
         <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-5">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-white backdrop-blur">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand-foreground/20 bg-brand-foreground/10 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-brand-foreground backdrop-blur">
             <SparklesIcon className="size-3.5" />
             Join 24,000+ farmers
           </span>
-          <h2 className="font-heading text-4xl font-medium tracking-tight text-balance text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-medium tracking-tight text-balance text-brand-foreground sm:text-5xl">
             Ready to meet your next herd member?
           </h2>
-          <p className="max-w-xl text-base leading-relaxed text-white/80">
+          <p className="max-w-xl text-base leading-relaxed text-brand-foreground/80">
             Browse today&apos;s listings, compare health records, and get
             livestock delivered to your gate — protected by our 7-day health
             guarantee.
@@ -72,7 +72,7 @@ function CtaSection() {
             <AnimatedButton
               href="/shop"
               size="lg"
-              className="rounded-full bg-white text-foreground hover:bg-white/90"
+              className="rounded-full bg-brand-foreground text-brand hover:bg-brand-foreground/90"
             >
               Start browsing
             </AnimatedButton>
@@ -80,7 +80,7 @@ function CtaSection() {
               href="/register"
               variant="ghost"
               size="lg"
-              className="rounded-full text-white hover:bg-white/10 hover:text-white"
+              className="rounded-full text-brand-foreground hover:bg-brand-foreground/10 hover:text-brand-foreground"
               showArrow={false}
             >
               <ShieldCheckIcon className="size-4" />
@@ -93,4 +93,5 @@ function CtaSection() {
   )
 }
 
-export { RecentBlog, CtaSection }
+export { CtaSection, RecentBlog }
+

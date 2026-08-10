@@ -26,7 +26,7 @@ function AnimatedButton({
 }: AnimatedButtonProps) {
   const content = (
     <>
-      <span className="transition-transform duration-300 group-hover:-translate-x-0.5">
+      <span className="inline-flex items-center gap-1.5 transition-transform duration-300 group-hover:-translate-x-0.5">
         {children}
       </span>
       {showArrow && (

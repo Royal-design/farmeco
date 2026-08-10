@@ -4,7 +4,7 @@ FROM oven/bun:1.3.14 AS deps
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --fetch-timeout=120000
+RUN bun install --frozen-lockfile --fetch-timeout=120000 --backend=copyfile
 
 FROM oven/bun:1.3.14 AS builder
 WORKDIR /app

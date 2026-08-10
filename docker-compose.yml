@@ -1,27 +1,25 @@
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Emmanuel123*}
-      POSTGRES_DB: farmeco
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  # local postgres is commented out — using Supabase for now
+  # db:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Emmanuel123*}
+  #     POSTGRES_DB: farmeco
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 10
 
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql+psycopg://farmeco:farmeco@db:5432/farmeco
+      DATABASE_URL: ${DATABASE_URL}
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
 
   web:
     build:
@@ -35,5 +33,5 @@ services:
     depends_on:
       - backend
 
-volumes:
-  db_data:
+# volumes:
+#   db_data:

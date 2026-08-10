@@ -96,10 +96,7 @@ async function forceSessionExpiry(): Promise<void> {
     toast.error("Session expired", {
       description: "Your session has timed out. Please sign in again to continue.",
     })
-    const redirect = encodeURIComponent(
-      window.location.pathname + window.location.search
-    )
-    window.location.assign(`/login?redirect=${redirect}`)
+    window.location.assign("/")
   }
 }
 

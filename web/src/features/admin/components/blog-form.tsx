@@ -1,29 +1,29 @@
 "use client"
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation } from "@tanstack/react-query"
+import { useRouter } from "next/navigation"
+import * as React from "react"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { blogSchema, type BlogFormValues } from "@/schemas/content.schema"
-import type { BlogPost } from "@/types/blog"
-import { blogService } from "@/services/blog.service"
-import { getErrorMessage } from "@/lib/errors"
 import { Button, ButtonLink } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldSet,
   FieldLegend,
+  FieldSet,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
 import { ImageUploader } from "@/features/admin/components/image-upload"
+import { getErrorMessage } from "@/lib/errors"
+import { blogSchema, type BlogFormValues } from "@/schemas/content.schema"
+import { blogService } from "@/services/blog.service"
+import type { BlogPost } from "@/types/blog"
 
 function BlogForm({
   post,
@@ -122,8 +122,8 @@ function BlogForm({
             render={({ field }) => (
               <Field>
                 <FieldLabel htmlFor="blog-tags">Tags</FieldLabel>
-                <FieldDescription>Comma separated</FieldDescription>
                 <Input id="blog-tags" placeholder="cattle, health" {...field} />
+                <FieldDescription>Comma separated</FieldDescription>
                 <FieldError errors={[form.formState.errors.tags]} />
               </Field>
             )}

@@ -45,6 +45,7 @@ http.interceptors.request.use((config) => {
 
 let refreshPromise: Promise<string | null> | null = null
 let expiryNotified = false
+let refreshTransientFailure = false
 
 async function refreshAccessToken(): Promise<string | null> {
   const { refreshToken } = getStoredTokens()
@@ -66,13 +67,22 @@ async function refreshAccessToken(): Promise<string | null> {
       const payload = data.data
       if (!payload) {
         clearStoredSession()
+        refreshTransientFailure = false
         return null
       }
       updateStoredTokens(payload.access_token, payload.refresh_token)
       expiryNotified = false
+      refreshTransientFailure = false
       return payload.access_token
-    } catch {
-      clearStoredSession()
+    } catch (error) {
+      const isDefinitive =
+        error instanceof AxiosError && error.response?.status !== undefined
+      if (isDefinitive) {
+        clearStoredSession()
+        refreshTransientFailure = false
+      } else {
+        refreshTransientFailure = true
+      }
       return null
     } finally {
       refreshPromise = null
@@ -136,7 +146,12 @@ http.interceptors.response.use(
       }
     }
 
-    if (status === 401 && original && !isAuthUrl) {
+    if (
+      status === 401 &&
+      original &&
+      !isAuthUrl &&
+      !refreshTransientFailure
+    ) {
       await forceSessionExpiry()
     }
 

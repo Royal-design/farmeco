@@ -41,7 +41,6 @@ function toSession(raw: RawAuthPayload): AuthSession {
     accessToken: raw.access_token,
     refreshToken: raw.refresh_token,
     tokenType: raw.token_type,
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
   }
   setStoredSession(session)
   return session
@@ -79,7 +78,6 @@ export const authService = {
       user: stored.user,
       accessToken: stored.accessToken,
       refreshToken: stored.refreshToken,
-      expiresAt: stored.expiresAt,
     }
   },
 

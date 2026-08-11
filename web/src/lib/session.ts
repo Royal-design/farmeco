@@ -6,7 +6,6 @@ export interface StoredSession {
   user: User
   accessToken: string
   refreshToken: string
-  expiresAt?: string
 }
 
 export function getStoredSession(): StoredSession | null {
@@ -19,10 +18,6 @@ export function getStoredSession(): StoredSession | null {
       return null
     }
     const session = JSON.parse(raw) as StoredSession
-    if (session.expiresAt && new Date(session.expiresAt) <= new Date()) {
-      window.localStorage.removeItem(SESSION_KEY)
-      return null
-    }
     return session
   } catch {
     window.localStorage.removeItem(SESSION_KEY)

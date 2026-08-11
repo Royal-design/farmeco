@@ -43,30 +43,42 @@ http.interceptors.request.use((config) => {
   return config
 })
 
+let refreshPromise: Promise<string | null> | null = null
+let expiryNotified = false
+
 async function refreshAccessToken(): Promise<string | null> {
   const { refreshToken } = getStoredTokens()
   if (!refreshToken) {
     return null
   }
-  try {
-    const { data } = await axios.post<ApiEnvelope<{
-      access_token: string
-      refresh_token: string
-    }>>(
-      `${API_BASE}/auth/refresh`,
-      { refresh_token: refreshToken }
-    )
-    const payload = data.data
-    if (!payload) {
+  if (refreshPromise) {
+    return refreshPromise
+  }
+  refreshPromise = (async () => {
+    try {
+      const { data } = await axios.post<ApiEnvelope<{
+        access_token: string
+        refresh_token: string
+      }>>(
+        `${API_BASE}/auth/refresh`,
+        { refresh_token: refreshToken }
+      )
+      const payload = data.data
+      if (!payload) {
+        clearStoredSession()
+        return null
+      }
+      updateStoredTokens(payload.access_token, payload.refresh_token)
+      expiryNotified = false
+      return payload.access_token
+    } catch {
       clearStoredSession()
       return null
+    } finally {
+      refreshPromise = null
     }
-    updateStoredTokens(payload.access_token, payload.refresh_token)
-    return payload.access_token
-  } catch {
-    clearStoredSession()
-    return null
-  }
+  })()
+  return refreshPromise
 }
 
 function toApiError(error: AxiosError<ApiEnvelope<unknown>>): ApiError {
@@ -90,6 +102,11 @@ async function forceSessionExpiry(): Promise<void> {
 
   const { useAuthStore } = await import("@/store/auth-store")
   useAuthStore.getState().expireSession()
+
+  if (expiryNotified) {
+    return
+  }
+  expiryNotified = true
 
   const alreadyOnLogin = window.location.pathname.startsWith("/login")
   if (!alreadyOnLogin) {
